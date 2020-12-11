@@ -1,9 +1,6 @@
-<<<<<<< HEAD
 # tutor
 
-
-
-## QuickStart
+## 快速启动
 
 <!-- add docs here for user -->
 
@@ -34,4 +31,3 @@ $ npm stop
 [egg]: https://eggjs.org
 =======
 # tutor
->>>>>>> 650c3acb44eb2b3f92c7d2ff8b3a098830c236e5
