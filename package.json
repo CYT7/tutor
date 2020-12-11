@@ -1,7 +1,7 @@
 {
   "name": "tutor",
   "version": "1.0.0",
-  "description": "",
+  "description": "毕业设计",
   "private": true,
   "egg": {
     "declarations": true
