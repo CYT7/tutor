@@ -11,7 +11,9 @@ class AdminController extends Controller {
     // TODO
   }
   async index() {
-    // TODO
+    const { ctx } = this;
+    ctx.body = 'hi, egg';
+    ctx.status = 201;
   }
 }
 
