@@ -8,7 +8,8 @@ const Controller = require('egg').Controller;
 
 class AdminController extends Controller {
   async create() {
-    // TODO
+    const { ctx } = this;
+    ctx.body = await ctx.service.admin.create(ctx.request.body);
   }
   async index() {
     const { ctx } = this;
