@@ -22,21 +22,27 @@ module.exports = appInfo => {
   const userConfig = {
     // myAppName: 'egg',
   };
+  // csrf config
+  config.security = {
+    csrf: {
+      enable: false,
+    },
+    domainWhiteList: [ '*' ],
+  };
 
-
-  config.sequelize = {
-    dialect: 'mysql',
-    host: 'localhost',
-    port: 3306,
-    database: 'tutor',
-    username: 'root',
-    password: '990129',
-    define: {
-      freezeTableName: true,
-      underscored: true,
-      timestamps: false,
-      createdAt: 'create_time',
-      updatedAt: 'update_time',
+  // MongoDB config
+  config.mongoose = {
+    client: {
+      url: 'mongodb://127.0.0.1/tutor',
+      options: {
+        useNewUrlParser: true,
+        useCreateIndex: true,
+        useUnifiedTopology: true,
+      },
+      plugins: [],
+      loadModel: true,
+      app: true,
+      agent: false,
     },
   };
 

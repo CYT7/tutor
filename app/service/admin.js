@@ -13,17 +13,16 @@ class AdminService extends Service {
     const { ctx } = this;
     try {
       const md5Passwd = md5(params.password);
-      const check = await ctx.model.user.findOne({
-        where: { username: params.username },
-      });
+      const check = await ctx.model.Admin.findOne({ names: params.name });
       if (check) {
         ctx.status = 406;
         return Object.assign(ERROR, { msg: '用户名已经存在' });
       }
-      const res = await ctx.model.user.create({
-        username: params.name,
+      const res = await ctx.model.Admin.create({
+        name,
         password: md5Passwd,
         realname: params.realname,
+        createTime: Math.round(new Date() / 1000),
       });
       ctx.status = 201;
       return Object.assign(SUCCESS, { data: res });

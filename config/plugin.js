@@ -18,8 +18,8 @@ module.exports = {
     enable: true,
     package: 'egg-validate',
   },
-  sequelize: {
+  mongoose: {
     enable: true,
-    package: 'egg-sequelize',
+    package: 'egg-mongoose',
   },
 };
