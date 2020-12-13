@@ -57,7 +57,90 @@ class AdminService extends Service {
       ctx.status = 500;
       throw (error);
     }
+  }
+  // 管理员个人信息
+  async information(params) {
+    const { ctx } = this;
+    try {
+      const admin = await ctx.model.Admin.findOne({ name: params.name });
+      if (!admin) {
+        ctx.status = 401;
+        return Object.assign(ERROR, { msg: '管理员账号不存在' });
+      }
+      const adminInformation = await ctx.model.Admin.findOne({ name: params.name }, { _id: 0, id: 0, password: 0 });
+      ctx.status = 201;
+      return Object.assign(SUCCESS, { msg: '管理员个人信息返回成功', data: adminInformation });
+    } catch (error) {
+      ctx.status = 500;
+      throw (error);
+    }
+  }
+  // 修改管理员个人信息
+  async modify(params) {
+    const { ctx } = this;
+    try {
+      const admin = await ctx.model.Admin.findOne({ name: params.name });
+      if (!admin) {
+        ctx.status = 401;
+        return Object.assign(ERROR, { msg: '管理员账号不存在' });
+      }
+      const oldPwd = md5(params.oldPassword);
+      if (oldPwd !== admin.password) { return Object.assign(ERROR, { msg: '旧密码输入错误，请重新输入' }); }
+      const checkParams = [ 'realname', 'password' ];
+      const newData = new Map();
+      params.password = md5(params.newPassword);
+      if (oldPwd === params.password) { return Object.assign(ERROR, { msg: '新密码不得和旧密码一模一样，请重新输入' }); }
+      const paramMap = new Map(Object.entries(params));
+      const newAdmin = new Map(Object.entries(admin.toObject()));
+      for (const k of paramMap.keys()) {
+        if (params[k] !== newAdmin.get(k)) {
+          if (!checkParams.includes(k)) { continue; }
+          if (!params[k]) { continue; }
+          newData.set(k, params[k]);
+        }
+      }
+      if (!newData.size) { return Object.assign(ERROR, { msg: '没有进行任何修改' }); }
+      const obj = Object.create(null);
+      for (const [ k, v ] of newData) {
+        obj[k] = v;
+      }
+      obj.updateTime = Math.round(new Date() / 1000);
+      await this.ctx.model.Admin.updateOne({ name: params.name }, obj);
+      ctx.status = 201;
+      return Object.assign(SUCCESS, { msg: '管理员个人信息修改成功' });
+    } catch (error) {
+      ctx.status = 500;
+      throw (error);
+    }
+  }
+
+  async list(page) {
+    const { ctx } = this;
+    try {
+      const { pageSize } = this.config.paginatorConfig;
+      const total = await this.ctx.model.Admin.find({}).ne('status', 0).count();
+      if (!total) {
+        ctx.status = 401;
+        return Object.assign(ERROR, { msg: '暂无管理员信息' });
+      }
+      const totals = Math.ceil(total / pageSize);
+      if (page > totals) { return [ -2, '无效页码' ]; }
+      if (page < 1) { page = 1; }
+      const result = await this.ctx.model.Admin.find({}).ne('status', 0).skip((page - 1) * pageSize)
+        .limit(pageSize);
+      if (!Number(page)) {
+        page = 1;
+      } else {
+        page = Number(page);
+      }
+      ctx.status = 201;
+      return Object.assign(SUCCESS, { msg: '所有管理员信息返回成功', data: result, totals, page });
+    } catch (error) {
+      ctx.status = 500;
+      throw (error);
+    }
 
   }
+
 }
 module.exports = AdminService;

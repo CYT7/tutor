@@ -16,6 +16,7 @@ module.exports = app => {
     password: String,
     status: { type: Number, default: 1 }, // 1 正常 0 禁用
     createTime: Number,
+    updateTime: Number,
   });
 
   return mongoose.model('Admin', AdminSchema);

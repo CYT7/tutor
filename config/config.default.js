@@ -46,6 +46,10 @@ module.exports = appInfo => {
     },
   };
 
+  config.paginatorConfig = {
+    pageSize: 12,
+  };
+
   return {
     ...config,
     ...userConfig,

@@ -14,5 +14,7 @@ module.exports = app => {
   const adminApi = '/admin';
   router.post(`${adminApi}/create`, controller.admin.admin.create);
   router.post(`${adminApi}/login`, controller.admin.admin.login);
-  router.get(`${adminApi}/index`, controller.admin.admin.index);
+  router.post(`${adminApi}/information`, controller.admin.admin.information);
+  router.put(`${adminApi}/information`, controller.admin.admin.modify);
+  router.get(`${adminApi}/list`, controller.admin.admin.list);
 };
