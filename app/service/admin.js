@@ -52,7 +52,7 @@ class AdminService extends Service {
         return Object.assign(ERROR, { msg: '密码错误，请重新输入' });
       }
       ctx.status = 201;
-      return Object.assign(SUCCESS, { msg: '管理员登录成功' });
+      return Object.assign(SUCCESS, { msg: `${params.name} 登录成功，欢迎回来` });
     } catch (error) {
       ctx.status = 500;
       throw (error);
