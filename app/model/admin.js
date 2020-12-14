@@ -10,12 +10,12 @@ module.exports = app => {
 
   const AdminSchema = new Schema({
     id: Number,
-    name: String,
-    realName: String,
-    password: String,
-    status: { type: Number, default: 1 }, // 1 正常 0 禁用
-    createTime: Number,
-    updateTime: Number,
+    name: String, // 管理员登陆名
+    realName: String, // 管理员真实姓名
+    password: String, // 管理员登陆密码
+    status: { type: Number, default: 1 }, // 管理员状态 1 正常 0 禁用
+    createTime: Number, // 创建时间
+    updateTime: Number, // 更新时间
   });
 
   return mongoose.model('Admin', AdminSchema);
