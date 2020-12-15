@@ -15,9 +15,9 @@ module.exports = app => {
     totalComment: { type: Number, default: 0 }, // 评论次数
     experience: { type: Number, default: 0 }, // 教学经验(年)
     age: { type: Number, default: 0 }, // 年龄
-    goodAt: { type: String, default: null }, // 擅长科目
+    goodAt: { type: Array, default: null }, // 擅长科目
     State: { type: Number, default: 0 }, // 审核状态 1已提交 2审核不通过 3审核通过
-    hourPrice: { type: Number, default: 0 }, // 课时费用
+    hourPrice: { type: Number }, // 课时费用
     status: { type: Number, default: 1 }, // 状态 0禁用 1正常
     createTime: { type: Number, default: null }, // 创建时间
     updateTime: { type: Number, default: null }, // 更新时间

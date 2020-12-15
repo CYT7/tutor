@@ -7,6 +7,10 @@
 const Controller = require('egg').Controller;
 
 class TeacherController extends Controller {
-  //TODO
+  // 创建teacher
+  async create() {
+    const { ctx } = this;
+    ctx.body = await ctx.service.teacher.create(ctx.request.body);
+  }
 }
 module.exports = TeacherController;
