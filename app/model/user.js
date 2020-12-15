@@ -21,6 +21,7 @@ module.exports = app => {
     balance: { type: Number, default: 0.00 }, // 余额
     gender: { type: Number, default: 0 }, // 性别 0 未知，1男 2女
     status: { type: Number, default: 1 }, // 状态 1 正常 0 禁用
+    image_url: { type: String, default: null }, // 头像地址
     createTime: { type: Number, default: null }, // 创建时间
     updateTime: { type: Number, default: null }, // 更新时间
   });

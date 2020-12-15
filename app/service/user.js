@@ -145,5 +145,6 @@ class UserService extends Service {
       throw (error);
     }
   }
+
 }
 module.exports = UserService;
