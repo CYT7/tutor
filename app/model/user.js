@@ -8,9 +8,9 @@ module.exports = app => {
   const mongoose = app.mongoose;
   const Schema = mongoose.Schema;
 
-  const AdminSchema = new Schema({
+  const UserSchema = new Schema({
     id: Number,
-    nickName: String, // 昵称
+    nickName: { type: String, default: null }, // 昵称
     realName: { type: String, default: null }, // 真实姓名
     phone: { type: String, default: null }, // 联系方式
     email: { type: String, default: null }, // 邮箱
@@ -25,5 +25,5 @@ module.exports = app => {
     updateTime: { type: Number, default: null }, // 更新时间
   });
 
-  return mongoose.model('Admin', AdminSchema);
+  return mongoose.model('User', UserSchema);
 };

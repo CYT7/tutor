@@ -13,7 +13,7 @@ class UserService extends Service {
   async create(params) {
     const { ctx } = this;
     try {
-      const checkUser = await ctx.model.User.findOne({ $or: [{ phone: params.phone }, { email: params.email }] });
+      const checkUser = await ctx.model.User.findOne({ email: params.email, phone: params.phone});
       if (checkUser) {
         ctx.status = 400;
         return Object.assign(ERROR, { msg: '系统已拥有这账号，请前往登录' });
@@ -25,15 +25,19 @@ class UserService extends Service {
         email: params.email,
         password: md5(params.password),
       });
+      newUser.nickName = params.nickName;
+      if (!params.nickName) {
+        const round = Math.random().toString(36).substr(3, 5) + Date.now().toString(36);
+        newUser.nickName = '用户' + round;
+      }
       if (!user.length) {
         newUser.id = new Date().getFullYear().toString()
-          .substr(2, 2) + '01';
-      }
-      if (!params.nickName) {
-        newUser.nickName = '用户' + Math.random().toString(36).substr(0, 7);
+          .substr(0, 4) + '1';
         newUser.save();
+        ctx.status = 201;
+        return Object.assign(SUCCESS, { msg: '用户创建成功，你可以进行登录了', data: newUser });
       }
-      newUser.nickName = params.nickName;
+      newUser.id = user[0].id + 1;
       newUser.save();
       ctx.status = 201;
       return Object.assign(SUCCESS, { msg: '用户创建成功，你可以进行登录了', data: newUser });

@@ -11,8 +11,8 @@
  * 2.前端路由前缀： /business/{version}
  */
 module.exports = app => {
-  // require('./router/business')(app);
   require('./router/admin')(app);
+  require('./router/business')(app);
   // const { router, controller } = app;
   // router.get('/', controller.home.index);
 };
