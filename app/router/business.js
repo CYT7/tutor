@@ -13,4 +13,7 @@ module.exports = app => {
    **/
   const userApi = '/business/user';
   router.post(`${userApi}/create`, controller.business.user.create);
+  router.post(`${userApi}/login`, controller.business.user.login);
+  router.post(`${userApi}/information`, controller.business.user.information);
+  router.put(`${userApi}/information`, controller.business.user.modify);
 };
