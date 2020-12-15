@@ -13,7 +13,7 @@ class UserService extends Service {
   async create(params) {
     const { ctx } = this;
     try {
-      const checkUser = await ctx.model.User.findOne({ email: params.email, phone: params.phone });
+      const checkUser = await ctx.model.User.findOne({ $or: [{ phone: params.phone }, { email: params.email }] });
       if (checkUser) {
         ctx.status = 400;
         return Object.assign(ERROR, { msg: '系统已拥有这账号，请前往登录' });
@@ -50,7 +50,7 @@ class UserService extends Service {
   async login(params) {
     const { ctx } = this;
     try {
-      const check = await ctx.model.User.findOne({ phone: params.phone, email: params.email }).ne('status', 0);
+      const check = await ctx.model.User.findOne({ $or: [{ phone: params.phone }, { email: params.email }] }).ne('status', 0);
       if (!check) {
         ctx.status = 400;
         return Object.assign(ERROR, { msg: '查无此账号，请前往创建或者联系管理员' });
@@ -68,7 +68,7 @@ class UserService extends Service {
   async information(params) {
     const { ctx } = this;
     try {
-      const check = await ctx.model.User.findOne({ phone: params.phone, email: params.email }, { _id: 0, password: 0 }).ne('status', 0);
+      const check = await ctx.model.User.findOne({ $or: [{ phone: params.phone }, { email: params.email }] }, { _id: 0, password: 0 }).ne('status', 0);
       if (!check) {
         ctx.status = 400;
         return Object.assign(ERROR, { msg: '查无此账号，请前往创建或者联系管理员' });
@@ -111,7 +111,7 @@ class UserService extends Service {
   async modify(params) {
     const { ctx } = this;
     try {
-      const user = await ctx.model.User.findOne({ phone: params.phone, email: params.email }).ne('status', 0);
+      const user = await ctx.model.User.findOne({ $or: [{ phone: params.phone }, { email: params.email }] }).ne('status', 0);
       if (!user) {
         ctx.status = 400;
         return Object.assign(ERROR, { msg: '查无此账号，请前往创建或者联系管理员' });
@@ -137,7 +137,7 @@ class UserService extends Service {
         obj[k] = v;
       }
       obj.updateTime = Math.round(new Date() / 1000);
-      await this.ctx.model.User.updateOne({ phone: params.phone, email: params.email }, obj);
+      await this.ctx.model.User.updateOne({ $or: [{ phone: params.phone }, { email: params.email }] }, obj);
       ctx.status = 201;
       return Object.assign(SUCCESS, { msg: '用户个人信息修改成功' });
     } catch (error) {
