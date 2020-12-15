@@ -18,6 +18,15 @@ module.exports = app => {
   router.put(`${adminApi}/information`, controller.admin.admin.modify);
   router.get(`${adminApi}/list`, controller.admin.admin.list);
 
+  /**
+   * 分类相关接口
+   */
+  const categoryApi = '/admin/category';
+  router.post(`${categoryApi}/create`, controller.admin.category.create);
+  router.delete(`${categoryApi}/delete`, controller.admin.category.del);
+  router.put(`${categoryApi}/modify`, controller.admin.category.modify);
+  router.get(`${categoryApi}/list`, controller.admin.category.list);
+
   const userApi = '/admin/user';
   router.get(`${userApi}/list`, controller.admin.user.list);
 };
