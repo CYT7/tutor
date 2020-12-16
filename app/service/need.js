@@ -42,5 +42,9 @@ class NeedService extends Service {
       throw (error);
     }
   }
+  // 查看需求信息
+  async information(params) {
+
+  }
 }
 module.exports = NeedService;

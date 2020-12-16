@@ -11,6 +11,7 @@ module.exports = app => {
   const NeedSchema = new Schema({
     id: { type: String },
     User: { type: Schema.Types.ObjectId, ref: 'User' }, // 用户
+    tradeNo: { type: String, default: null }, // 订单号
     nickName: { type: String, default: null }, // 称呼，如陈同学，详情页展示(必选)
     phone: { type: String, default: null }, // 联系电话，家教中标才展示,详情页面不展示(必选)
     wechat: { type: String, default: null }, // 微信号，教员中标后才展示,详情页面不展示(可选)
