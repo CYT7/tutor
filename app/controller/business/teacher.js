@@ -12,5 +12,15 @@ class TeacherController extends Controller {
     const { ctx } = this;
     ctx.body = await ctx.service.teacher.create(ctx.request.body);
   }
+  // 查看教师个人信息
+  async information() {
+    const { ctx } = this;
+    ctx.body = await ctx.service.teacher.information(ctx.request.body);
+  }
+  // 修改教师个人信息
+  async modify() {
+    const { ctx } = this;
+    ctx.body = await ctx.service.teacher.modify(ctx.request.body);
+  }
 }
 module.exports = TeacherController;

@@ -9,7 +9,7 @@ module.exports = app => {
   const Schema = mongoose.Schema;
 
   const TeacherSchema = new Schema({
-    id: Number,
+    id: { type: String, allowNull: false },
     User: { type: Schema.Types.ObjectId, ref: 'User' }, // 用户
     totalSuccess: { type: Number, default: 0 }, // 成功次数
     totalComment: { type: Number, default: 0 }, // 评论次数

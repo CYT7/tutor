@@ -16,4 +16,12 @@ module.exports = app => {
   router.post(`${userApi}/login`, controller.business.user.login);
   router.post(`${userApi}/information`, controller.business.user.information);
   router.put(`${userApi}/information`, controller.business.user.modify);
+
+  /**
+   * 教师相关接口
+   **/
+  const teacherApi = '/business/teacher';
+  router.post(`${teacherApi}/create`, controller.business.teacher.create);
+  router.post(`${teacherApi}/information`, controller.business.teacher.information);
+  router.put(`${teacherApi}/information`, controller.business.teacher.modify);
 };
