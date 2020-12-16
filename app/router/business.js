@@ -30,4 +30,5 @@ module.exports = app => {
    */
   const needApi = '/business/need';
   router.post(`${needApi}/create`, controller.business.need.create);
+  router.post(`${needApi}/apply`, controller.business.need.apply);
 };

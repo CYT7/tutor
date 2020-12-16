@@ -42,9 +42,29 @@ class NeedService extends Service {
       throw (error);
     }
   }
+  // 申请需求(老师申请执教）
+  async apply(params) {
+    const { ctx } = this;
+    try {
+      const teacher = await this.ctx.model.Teacher.findOne({ id: params.teacherId }).ne('status', 0);
+      if (!teacher) {
+        ctx.status = 401;
+        return Object.assign(ERROR, { msg: 'sorry，你暂无执教资格，请前往申请' });
+      }
+      const need = await ctx.model.Need.findOne({ id: params.id, state: 3 }).ne('status', 0);
+      if (!need) { return Object.assign(ERROR, { msg: 'sorry,查无此需求' }); }
+      need.total_appoint += `${teacher}`;
+      need.save();
+      ctx.status = 201;
+      return Object.assign(SUCCESS, { msg: '该需求你申请成功，请等家长选择' });
+    } catch (error) {
+      ctx.status = 500;
+      throw (error);
+    }
+  }
   // 查看需求信息
-  async information(params) {
-
+  async information() {
+    // todo
   }
 }
 module.exports = NeedService;
