@@ -12,6 +12,11 @@ class AdminController extends Controller {
     const { ctx } = this;
     ctx.body = await ctx.service.admin.create(ctx.request.body);
   }
+  // 所有管理员的信息
+  async list() {
+    const { ctx } = this;
+    ctx.body = await ctx.service.admin.list(ctx.request.query.page);
+  }
   // 管理员登录
   async login() {
     const { ctx } = this;
@@ -26,11 +31,6 @@ class AdminController extends Controller {
   async modify() {
     const { ctx } = this;
     ctx.body = await ctx.service.admin.modify(ctx.request.body);
-  }
-  // 所有管理员的信息
-  async list() {
-    const { ctx } = this;
-    ctx.body = await ctx.service.admin.list(ctx.request.query.page);
   }
 }
 

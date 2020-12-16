@@ -9,14 +9,14 @@ module.exports = app => {
   const Schema = mongoose.Schema;
 
   const NeedSchema = new Schema({
-    id: Number,
+    id: { type: String },
     User: { type: Schema.Types.ObjectId, ref: 'User' }, // 用户
     nickName: { type: String, default: null }, // 称呼，如陈同学，详情页展示(必选)
     phone: { type: String, default: null }, // 联系电话，家教中标才展示,详情页面不展示(必选)
     wechat: { type: String, default: null }, // 微信号，教员中标后才展示,详情页面不展示(可选)
     qq: { type: String, default: null }, // QQ 教员中标后才展示,详情页面不展示(可选)
     gender: { type: Number, default: 0 }, // 性别 1男2女，详情页展示(必选)
-    teacherGender: { type: Number, default: 0 }, // 教师性别要求 1男2女3不限 搜索条件(必选)
+    teacherGender: { type: Number, default: 0 }, // 教师性别要求 0不限1男2女 搜索条件(必选)
     studentComment: { type: Number, default: 0 }, // 学生是否已评论 0未评论 1已评论
     teacherComment: { type: Number, default: 0 }, // 老师是否已评论 0未评论 1已评论
     address: { type: String, default: null }, // 地址

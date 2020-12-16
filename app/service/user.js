@@ -13,7 +13,7 @@ class UserService extends Service {
   async create(params) {
     const { ctx } = this;
     try {
-      const checkUser = await ctx.model.User.findOne({ $or: [{ phone: params.phone }, { email: params.email }] });
+      const checkUser = await ctx.model.User.findOne({ $or: [{ phone: params.phone }, { email: params.email }] }).ne('status', 0);;
       if (checkUser) {
         ctx.status = 400;
         return Object.assign(ERROR, { msg: '系统已拥有这账号，请前往登录' });
