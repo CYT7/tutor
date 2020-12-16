@@ -27,6 +27,14 @@ module.exports = app => {
   router.put(`${categoryApi}/modify`, controller.admin.category.modify);
   router.get(`${categoryApi}/list`, controller.admin.category.list);
 
+  /**
+   * 教师相关接口
+   */
+  const teacherApi = '/admin/teacher';
+  router.post(`${teacherApi}/agree`, controller.admin.teacher.agree);
+  router.post(`${teacherApi}/disagree`, controller.admin.teacher.disagree);
+  router.get(`${teacherApi}/list`, controller.admin.teacher.list);
+
   const userApi = '/admin/user';
   router.get(`${userApi}/list`, controller.admin.user.list);
 };

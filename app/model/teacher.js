@@ -16,7 +16,7 @@ module.exports = app => {
     experience: { type: Number, default: 0 }, // 教学经验(年)
     age: { type: Number, default: 0 }, // 年龄
     goodAt: { type: Array, default: null }, // 擅长科目
-    State: { type: Number, default: 0 }, // 审核状态 1已提交 2审核不通过 3审核通过
+    state: { type: Number, default: 1 }, // 审核状态 1已提交 2审核不通过 3审核通过
     hourPrice: { type: Number }, // 课时费用
     status: { type: Number, default: 1 }, // 状态 0禁用 1正常
     createTime: { type: Number, default: null }, // 创建时间

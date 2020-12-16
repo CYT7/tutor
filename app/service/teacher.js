@@ -88,6 +88,7 @@ class TeacherService extends Service {
       for (const [ k, v ] of newData) {
         obj[k] = v;
       }
+      obj.state = 1;
       obj.updateTime = Math.round(new Date() / 1000);
       await this.ctx.model.Teacher.updateOne({ User: user }, obj);
       return Object.assign(SUCCESS, { msg: '家教个人信息修改成功' });
@@ -95,7 +96,74 @@ class TeacherService extends Service {
       ctx.status = 500;
       throw (error);
     }
-
+  }
+  // 管理员审核通过
+  async agree(params) {
+    const { ctx } = this;
+    try {
+      const admin = await ctx.model.Admin.findOne({ name: params.name });
+      if (!admin) {
+        ctx.status = 401;
+        return Object.assign(ERROR, { msg: '管理员账号不存在' });
+      }
+      const teacher = await ctx.model.Teacher.findOne({ id: params.id }).ne('status', 0);
+      if (!teacher) {
+        return Object.assign((ERROR, { msg: '不存在该老师，参数异常' }));
+      }
+      await this.ctx.model.Teacher.updateOne({ id: teacher.id }, { state: 3 });
+      ctx.status = 201;
+      return Object.assign(SUCCESS, { msg: `${teacher.User}审核通过` });
+    } catch (error) {
+      ctx.status = 500;
+      throw (error);
+    }
+  }
+  // 管理员审核不通过
+  async disagree(params) {
+    const { ctx } = this;
+    try {
+      const admin = await ctx.model.Admin.findOne({ name: params.name });
+      if (!admin) {
+        ctx.status = 401;
+        return Object.assign(ERROR, { msg: '管理员账号不存在' });
+      }
+      const teacher = await ctx.model.Teacher.findOne({ id: params.id }).ne('status', 0);
+      if (!teacher) {
+        return Object.assign((ERROR, { msg: '不存在该老师，参数异常' }));
+      }
+      await this.ctx.model.Teacher.updateOne({ id: teacher.id }, { state: 2 });
+      ctx.status = 201;
+      return Object.assign(SUCCESS, { msg: `${teacher.User}审核不通过` });
+    } catch (error) {
+      ctx.status = 500;
+      throw (error);
+    }
+  }
+  // 所有教师信息列表
+  async list(page) {
+    const { ctx } = this;
+    try {
+      const { pageSize } = this.config.paginatorConfig;
+      const total = await this.ctx.model.Teacher.find({}).count();
+      if (!total){
+        ctx.status = 401;
+        return Object.assign(ERROR, { msg: '暂无教师信息' });
+      }
+      const totals = Math.ceil(total / pageSize);
+      if (page > totals) { return [ -2, '无效页码' ]; }
+      if (page < 1) { page = 1; }
+      const result = await this.ctx.model.Teacher.find({}).skip((page - 1) * pageSize).limit(pageSize);
+      if (!Number(page)) {
+        page = 1;
+      } else {
+        page = Number(page);
+      }
+      ctx.status = 201;
+      return Object.assign(SUCCESS, { msg: '所有教师信息返回成功', data: result, totals, page });
+    } catch (error) {
+      ctx.status = 500;
+      throw (error);
+    }
   }
 }
 module.exports = TeacherService;
