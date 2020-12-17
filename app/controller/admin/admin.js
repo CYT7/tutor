@@ -1,6 +1,7 @@
 /**
  * @author: Chenyt
  * @date: 2020/12/11 11:00 AM
+* @modifyDate：2020/12/17 8：40PM
  */
 'use strict';
 
@@ -11,6 +12,11 @@ class AdminController extends Controller {
   async create() {
     const { ctx } = this;
     ctx.body = await ctx.service.admin.create(ctx.request.body);
+  }
+  // 删除管理员
+  async delete() {
+    const { ctx } = this;
+    ctx.body = await ctx.service.admin.delete (ctx.request.body);
   }
   // 所有管理员的信息
   async list() {

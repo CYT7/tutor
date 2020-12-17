@@ -1,6 +1,7 @@
 /**
  * @author: Chen yt7
  * @date: 2020/12/14 10:15 AM
+* @modifyDate：2020/12/17 8：40PM
  */
 'use strict';
 
@@ -13,10 +14,10 @@ class UserService extends Service {
   async create(params) {
     const { ctx } = this;
     try {
-      const checkUser = await ctx.model.User.findOne({ $or: [{ phone: params.phone }, { email: params.email }] }).ne('status', 0);;
+      const checkUser = await ctx.model.User.findOne({ $or: [{ phone: params.phone }, { email: params.email }] }).ne('status', 0);
       if (checkUser) {
         ctx.status = 400;
-        return Object.assign(ERROR, { msg: '系统已拥有这账号，请前往登录' });
+        return Object.assign(ERROR, { msg: '你已经创建过啦，请前往登录亲' });
       }
       const user = await ctx.model.User.aggregate().sort({ id: -1 });
       const newUser = new ctx.model.User({
@@ -35,12 +36,12 @@ class UserService extends Service {
           .substr(0, 4) + '1';
         newUser.save();
         ctx.status = 201;
-        return Object.assign(SUCCESS, { msg: '用户创建成功，你可以进行登录了', data: newUser });
+        return Object.assign(SUCCESS, { msg: '用户创建成功，你可以进行登录了' });
       }
       newUser.id = user[0].id + 1;
       newUser.save();
       ctx.status = 201;
-      return Object.assign(SUCCESS, { msg: '用户创建成功，你可以进行登录了', data: newUser });
+      return Object.assign(SUCCESS, { msg: '用户创建成功，你可以进行登录了' });
     } catch (error) {
       ctx.status = 500;
       throw (error);
@@ -50,15 +51,15 @@ class UserService extends Service {
   async login(params) {
     const { ctx } = this;
     try {
-      const check = await ctx.model.User.findOne({ $or: [{ phone: params.phone }, { email: params.email }] }).ne('status', 0);
-      if (!check) {
+      const user = await ctx.model.User.findOne({ $or: [{ phone: params.phone }, { email: params.email }] }).ne('status', 0);
+      if (!user) {
         ctx.status = 400;
-        return Object.assign(ERROR, { msg: '查无此账号，请前往创建或者联系管理员' });
+        return Object.assign(ERROR, { msg: '亲，你尚未创建账号或者被禁用(请联系管理员)了哦' });
       }
       const pwd = md5(params.password);
-      if (pwd !== check.password) { return Object.assign(ERROR, { msg: '登录失败，密码错误' }); }
+      if (pwd !== user.password) { return Object.assign(ERROR, { msg: '登录失败，密码错误' }); }
       ctx.status = 201;
-      return Object.assign(SUCCESS, { msg: `${check.nickName} 登录成功，欢迎回来` });
+      return Object.assign(SUCCESS, { msg: `${user.nickName} 登录成功，欢迎回来` });
     } catch (error) {
       ctx.status = 500;
       throw (error);
@@ -68,13 +69,13 @@ class UserService extends Service {
   async information(params) {
     const { ctx } = this;
     try {
-      const check = await ctx.model.User.findOne({ $or: [{ phone: params.phone }, { email: params.email }] }, { _id: 0, password: 0 }).ne('status', 0);
-      if (!check) {
+      const user = await ctx.model.User.findOne({ $or: [{ phone: params.phone }, { email: params.email }] }, { _id: 0, password: 0 }).ne('status', 0);
+      if (!user) {
         ctx.status = 400;
-        return Object.assign(ERROR, { msg: '查无此账号，请前往创建或者联系管理员' });
+        return Object.assign(ERROR, { msg: '参数异常' });
       }
       ctx.status = 201;
-      return Object.assign(SUCCESS, { msg: `${check.nickName}的个人信息返回成功`, data: check });
+      return Object.assign(SUCCESS, { msg: `${user.nickName}的个人信息返回成功`, data: user });
     } catch (error) {
       ctx.status = 500;
       throw (error);
@@ -145,6 +146,27 @@ class UserService extends Service {
       throw (error);
     }
   }
-
+  // 恢复用户状态
+  async recovery(params) {
+    const { ctx } = this;
+    try {
+      const admin = await ctx.model.Admin.findOne({ name: params.name }).ne('deleted', 0);
+      if (!admin) {
+        ctx.status = 401;
+        return Object.assign(ERROR, { msg: `不存在该管理员${admin.name}` });
+      }
+      const user = await ctx.model.User.findOne({ id: params.id }).ne('status', 1);
+      if (!user) {
+        ctx.status = 400;
+        return Object.assign(ERROR, { msg: '查无此账号' });
+      }
+      await this.ctx.model.User.updateOne({ id: user.id }, { status: 1 });
+      ctx.status = 201;
+      return Object.assign(SUCCESS, { msg: `${user.name}状态恢复正常，请告诉${user.name}` });
+    } catch (error) {
+      ctx.status = 500;
+      throw (error);
+    }
+  }
 }
 module.exports = UserService;

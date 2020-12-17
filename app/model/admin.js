@@ -1,6 +1,7 @@
 /**
  * @author: Chen yt7
  * @date: 2020/12/12 6:50 PM
+* @modifyDate：2020/12/17 8：40PM
  */
 'use strict';
 
@@ -9,7 +10,7 @@ module.exports = app => {
   const Schema = mongoose.Schema;
 
   const AdminSchema = new Schema({
-    id: Number,
+    id: Number, // 管理员编号
     name: String, // 管理员登陆名
     realName: String, // 管理员真实姓名
     password: String, // 管理员登陆密码
