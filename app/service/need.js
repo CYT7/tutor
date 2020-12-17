@@ -63,14 +63,30 @@ class NeedService extends Service {
     }
   }
   // 查看需求信息
-  async information() {
-    // todo
+  async information(params) {
+    const { ctx } = this;
+    try {
+      const user = await ctx.model.User.findOne({ $or: [{ phone: params.phone }, { email: params.email }] }).ne('status', 0);
+      if (!user) {
+        ctx.status = 400;
+        return Object.assign(ERROR, { msg: '参数异常' });
+      }
+      const need = await ctx.model.Need.findOne({ id: params.id });
+      if (!need) {
+        return Object.assign(ERROR, { msg: '查无此需求' });
+      }
+      ctx.status = 201;
+      return Object.assign(SUCCESS, { msg: `${need.id} 返回信息成功`, data: need });
+    } catch (error) {
+      ctx.status = 500;
+      throw (error);
+    }
   }
   // 审核需求 - 通过
   async agree(params) {
     const { ctx } = this;
     try {
-      const admin = await ctx.model.Admin.findOne({ name: params.name });
+      const admin = await ctx.model.Admin.findOne({ name: params.name }).ne('deleted', 0);
       if (!admin) {
         ctx.status = 401;
         return Object.assign(ERROR, { msg: '查无此管理员' });
@@ -78,11 +94,31 @@ class NeedService extends Service {
       const need = await ctx.model.Need.findOne({ id: params.id, state: 1 });
       if (!need) { return Object.assign(ERROR, { msg: '查无此需求' }); }
       await this.ctx.model.Need.updateOne({ id: need.id }, { state: 3 });
+      ctx.status = 201;
+      return Object.assign(SUCCESS, { msg: `${need.id} 审核通过` });
     } catch (error) {
       ctx.status = 500;
       throw (error);
     }
   }
   // 审核需求 - 不通过
+  async disagree(params) {
+    const { ctx } = this;
+    try {
+      const admin = await ctx.model.Admin.findOne({ name: params.name }).ne('deleted', 0);
+      if (!admin) {
+        ctx.status = 401;
+        return Object.assign(ERROR, { msg: '查无此管理员' });
+      }
+      const need = await ctx.model.Need.findOne({ id: params.id, state: 1 });
+      if (!need) { return Object.assign(ERROR, { msg: '查无此需求' }); }
+      await this.ctx.model.Need.updateOne({ id: need.id }, { state: 2 });
+      ctx.status = 201;
+      return Object.assign(SUCCESS, { msg: `${need.id} 审核不通过` });
+    } catch (error) {
+      ctx.status = 500;
+      throw (error);
+    }
+  }
 }
 module.exports = NeedService;
