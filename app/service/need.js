@@ -66,5 +66,23 @@ class NeedService extends Service {
   async information() {
     // todo
   }
+  // 审核需求 - 通过
+  async agree(params) {
+    const { ctx } = this;
+    try {
+      const admin = await ctx.model.Admin.findOne({ name: params.name });
+      if (!admin) {
+        ctx.status = 401;
+        return Object.assign(ERROR, { msg: '查无此管理员' });
+      }
+      const need = await ctx.model.Need.findOne({ id: params.id, state: 1 });
+      if (!need) { return Object.assign(ERROR, { msg: '查无此需求' }); }
+      await this.ctx.model.Need.updateOne({ id: need.id }, { state: 3 });
+    } catch (error) {
+      ctx.status = 500;
+      throw (error);
+    }
+  }
+  // 审核需求 - 不通过
 }
 module.exports = NeedService;
