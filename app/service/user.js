@@ -137,7 +137,7 @@ class UserService extends Service {
       const user = await ctx.model.User.findOne({ id: results[3] }).ne('status', 0);
       if (!user) {
         ctx.status = 400;
-        return Object.assign(ERROR, { msg: '查无此账号，请前往创建或者联系管理员' });
+        return Object.assign(ERROR, { msg: '查无此账号' });
       }
       if (params.oldPassword){
         const oldPwd = md5(params.oldPassword);
