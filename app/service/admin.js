@@ -7,6 +7,7 @@
 
 const Service = require('egg').Service;
 const md5 = require('js-md5');
+// const jwt = require('jwt');
 const { ERROR, SUCCESS } = require('../utils/restful');
 
 class AdminService extends Service {
@@ -37,7 +38,7 @@ class AdminService extends Service {
   }
   // 管理员登录
   async login(params) {
-    const { ctx } = this;
+    const { ctx, app } = this;
     try {
       if (!params.name && !params.password) {
         ctx.status = 400;
@@ -54,8 +55,14 @@ class AdminService extends Service {
         ctx.status = 402;
         return Object.assign(ERROR, { msg: '密码错误，请重新输入' });
       }
+      const exp = Math.round(new Date() / 1000) + (60 * 60 * 3);
+      const token = app.jwt.sign({
+        name: params.name,
+        iat: Math.round(new Date() / 1000),
+        exp,
+      }, app.config.jwt.secret);
       ctx.status = 201;
-      return Object.assign(SUCCESS, { msg: `${checkAdmin.name} 登录成功，欢迎回来` });
+      return Object.assign(SUCCESS, { msg: `${checkAdmin.name} 登录成功，欢迎回来`, token, exp });
     } catch (error) {
       ctx.status = 500;
       throw (error);

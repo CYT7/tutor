@@ -12,7 +12,7 @@ class CategoryService extends Service {
   async create(params) {
     const { ctx } = this;
     try {
-      const check = await ctx.model.Category.findOne({ name: params.name }).ne('deleted', 1);
+      const check = await ctx.model.Category.findOne({ name: params.name });
       if (check) {
         ctx.status = 400;
         return Object.assign(ERROR, { msg: '分类名已经存在' });

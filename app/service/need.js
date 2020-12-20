@@ -9,6 +9,7 @@ const md5 = require('js-md5');
 const { ERROR, SUCCESS } = require('../utils/restful');
 
 class NeedService extends Service {
+  // 创建需求
   async create(params) {
     const { ctx } = this;
     try {
@@ -115,6 +116,87 @@ class NeedService extends Service {
       await this.ctx.model.Need.updateOne({ id: need.id }, { state: 2 });
       ctx.status = 201;
       return Object.assign(SUCCESS, { msg: `${need.id} 审核不通过` });
+    } catch (error) {
+      ctx.status = 500;
+      throw (error);
+    }
+  }
+  // 需求已选定老师
+  async confirm(params) {
+    const { ctx } = this;
+    try {
+      const user = await ctx.model.User.findOne({ $or: [{ phone: params.phone }, { email: params.email }] }).ne('status', 0);
+      if (!user) {
+        ctx.status = 400;
+        return Object.assign(ERROR, { msg: '参数异常' });
+      }
+      const need = await ctx.model.Need.findOne({ id: params.id, state: 3 });
+      if (!need) { return Object.assign(ERROR, { msg: '查无此需求' }); }
+      const teacher = await ctx.model.Teacher.findOne({ id: params.teacherId }).ne('status', 0);
+      if (!teacher) { return Object.assign(ERROR, { msg: '查无此需求' }); }
+      await this.ctx.model.Need.updateOne({ id: need.id }, { state: 4, total_appoint: params.teacherId });
+      ctx.status = 201;
+      return Object.assign(SUCCESS, { msg: `${need.id} 已经选定老师` });
+    } catch (error) {
+      ctx.status = 500;
+      throw (error);
+    }
+  }
+
+  // 需求已完成
+  async finish(params) {
+    const { ctx } = this;
+    try {
+      const user = await ctx.model.User.findOne({ $or: [{ phone: params.phone }, { email: params.email }] }).ne('status', 0);
+      if (!user) {
+        ctx.status = 400;
+        return Object.assign(ERROR, { msg: '参数异常' });
+      }
+      const need = await ctx.model.Need.findOne({ id: params.id, state: 4 });
+      if (!need) { return Object.assign(ERROR, { msg: '查无此需求' }); }
+      await this.ctx.model.Need.updateOne({ id: need.id }, { state: 5 });
+      ctx.status = 201;
+      return Object.assign(SUCCESS, { msg: `${need.id} 需求已经完成` });
+    } catch (error) {
+      ctx.status = 500;
+      throw (error);
+    }
+  }
+  // 关闭需求
+  async close() {
+    const { ctx } = this;
+    try {
+      // todo
+    } catch (error) {
+      ctx.status = 500;
+      throw (error);
+    }
+  }
+  // 修改需求（审核不通过）
+  async modify() {
+    const { ctx } = this;
+    try {
+      // todo
+    } catch (error) {
+      ctx.status = 500;
+      throw (error);
+    }
+  }
+  // 所有需求信息
+  async list() {
+    const { ctx } = this;
+    try {
+      // todo
+    } catch (error) {
+      ctx.status = 500;
+      throw (error);
+    }
+  }
+  // 所有需求信息
+  async adminList() {
+    const { ctx } = this;
+    try {
+      // todo
     } catch (error) {
       ctx.status = 500;
       throw (error);
