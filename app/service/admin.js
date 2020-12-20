@@ -160,7 +160,7 @@ class AdminService extends Service {
       const totals = Math.ceil(total / pageSize);
       if (page > totals) { return [ -2, '无效页码' ]; }
       if (page < 1) { page = 1; }
-      const result = await this.ctx.model.Admin.find({}).ne('deleted', 0).skip((page - 1) * pageSize)
+      const adminResult = await this.ctx.model.Admin.find({}).ne('deleted', 0).skip((page - 1) * pageSize)
         .limit(pageSize);
       if (!Number(page)) {
         page = 1;
@@ -168,7 +168,7 @@ class AdminService extends Service {
         page = Number(page);
       }
       ctx.status = 201;
-      return Object.assign(SUCCESS, { msg: '所有管理员信息返回成功', result, totals, page });
+      return Object.assign(SUCCESS, { msg: '所有管理员信息返回成功', adminResult, totals, page });
     } catch (error) {
       ctx.status = 500;
       throw (error);

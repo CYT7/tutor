@@ -111,7 +111,7 @@ class UserService extends Service {
       const totals = Math.ceil(total / pageSize);
       if (page > totals) { return [ -2, '无效页码' ]; }
       if (page < 1) { page = 1; }
-      const result = await this.ctx.model.User.find({}, { _id: 0, password: 0 }).ne('status', 0).skip((page - 1) * pageSize)
+      const userResult = await this.ctx.model.User.find({}, { _id: 0, password: 0 }).ne('status', 0).skip((page - 1) * pageSize)
         .limit(pageSize);
       if (!Number(page)) {
         page = 1;
@@ -119,7 +119,7 @@ class UserService extends Service {
         page = Number(page);
       }
       ctx.status = 201;
-      return Object.assign(SUCCESS, { msg: '所有用户信息返回成功', data: result, totals, page });
+      return Object.assign(SUCCESS, { msg: '所有用户信息返回成功', data: userResult, totals, page });
     } catch (error) {
       ctx.status = 500;
       throw (error);
@@ -139,12 +139,14 @@ class UserService extends Service {
         ctx.status = 400;
         return Object.assign(ERROR, { msg: '查无此账号，请前往创建或者联系管理员' });
       }
-      const oldPwd = md5(params.oldPassword);
-      if (oldPwd !== user.password) { return Object.assign(ERROR, { msg: '旧密码输入错误，请重新输入' }); }
+      if (params.oldPassword){
+        const oldPwd = md5(params.oldPassword);
+        if (oldPwd !== user.password) { return Object.assign(ERROR, { msg: '旧密码输入错误，请重新输入' }); }
+        params.password = md5(params.newPassword);
+        if (oldPwd === params.password) { return Object.assign(ERROR, { msg: '新密码不得和旧密码一模一样，请重新输入' }); }
+      }
       const checkParams = [ 'nickName', 'realName', 'phone', 'email', 'password', 'qq', 'wechat', 'address', 'gender' ];
       const newData = new Map();
-      params.password = md5(params.newPassword);
-      if (oldPwd === params.password) { return Object.assign(ERROR, { msg: '新密码不得和旧密码一模一样，请重新输入' }); }
       const paramsMap = new Map(Object.entries(params));
       const newUser = new Map(Object.entries(user.toObject()));
       for (const k of paramsMap.keys()) {
@@ -160,7 +162,7 @@ class UserService extends Service {
         obj[k] = v;
       }
       obj.updateTime = Math.round(new Date() / 1000);
-      await this.ctx.model.User.updateOne({ $or: [{ phone: params.phone }, { email: params.email }] }, obj);
+      await this.ctx.model.User.updateOne({ id: results[3] }, obj);
       ctx.status = 201;
       return Object.assign(SUCCESS, { msg: '用户个人信息修改成功' });
     } catch (error) {
@@ -187,7 +189,7 @@ class UserService extends Service {
         ctx.status = 400;
         return Object.assign(ERROR, { msg: '查无此账号' });
       }
-      await this.ctx.model.User.updateOne({ id: user.id }, { status: 1 });
+      await this.ctx.model.User.updateOne({ id: params.id }, { status: 1 });
       ctx.status = 201;
       return Object.assign(SUCCESS, { msg: `用户${user.nickName}状态恢复正常，请告诉${user.nickName}` });
     } catch (error) {

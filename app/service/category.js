@@ -1,21 +1,28 @@
 /**
  * @author: Chen yt7
  * @date: 2020/12/12 3:30 PM
+ * @modifyDate：2020/12/20 9：00PM
  */
 'use strict';
 
 const Service = require('egg').Service;
+const jwt = require('../utils/jwt');
 const { ERROR, SUCCESS } = require('../utils/restful');
 
 class CategoryService extends Service {
   // 创建科目类
   async create(params) {
-    const { ctx } = this;
+    const { ctx, app } = this;
     try {
-      const check = await ctx.model.Category.findOne({ name: params.name });
-      if (check) {
+      const results = jwt(app, ctx.request.header.authorization);
+      if (results[0]) {
         ctx.status = 400;
-        return Object.assign(ERROR, { msg: '分类名已经存在' });
+        return Object.assign(ERROR, { msg: '请求失败' });
+      }
+      const admin = await ctx.model.Admin.findOne({ name: results[3] });
+      if (!admin) {
+        ctx.status = 406;
+        return Object.assign(ERROR, { msg: '不存在该管理员' });
       }
       const category = await ctx.model.Category.aggregate().sort({ id: -1 });
       const newCategory = new ctx.model.Category({
@@ -40,8 +47,18 @@ class CategoryService extends Service {
   }
   // 修改科目类
   async modify(params) {
-    const { ctx } = this;
+    const { ctx, app } = this;
     try {
+      const results = jwt(app, ctx.request.header.authorization);
+      if (results[0]) {
+        ctx.status = 400;
+        return Object.assign(ERROR, { msg: '请求失败' });
+      }
+      const admin = await ctx.model.Admin.findOne({ name: results[3] });
+      if (!admin) {
+        ctx.status = 406;
+        return Object.assign(ERROR, { msg: '不存在该管理员' });
+      }
       const category = await ctx.model.Category.findOne({ id: params.id }).ne('deleted', 0);
       if (!category) {
         ctx.status = 400;
@@ -74,8 +91,18 @@ class CategoryService extends Service {
   }
   // 删除科目类
   async del(params) {
-    const { ctx } = this;
+    const { ctx, app } = this;
     try {
+      const results = jwt(app, ctx.request.header.authorization);
+      if (results[0]) {
+        ctx.status = 400;
+        return Object.assign(ERROR, { msg: '请求失败' });
+      }
+      const admin = await ctx.model.Admin.findOne({ name: results[3] });
+      if (!admin) {
+        ctx.status = 406;
+        return Object.assign(ERROR, { msg: '不存在该管理员' });
+      }
       const category = await ctx.model.Category.findOne({ id: params.id }).ne('deleted', 0);
       if (!category) {
         ctx.status = 400;
