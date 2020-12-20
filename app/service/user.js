@@ -1,12 +1,13 @@
 /**
  * @author: Chen yt7
  * @date: 2020/12/14 10:15 AM
-* @modifyDate：2020/12/17 8：40PM
+* @modifyDate：2020/12/20 4：00PM
  */
 'use strict';
 
 const Service = require('egg').Service;
 const md5 = require('js-md5');
+const jwt = require('../utils/jwt');
 const { ERROR, SUCCESS } = require('../utils/restful');
 
 class UserService extends Service {
@@ -49,7 +50,7 @@ class UserService extends Service {
   }
   // 用户登录
   async login(params) {
-    const { ctx } = this;
+    const { ctx, app } = this;
     try {
       const user = await ctx.model.User.findOne({ $or: [{ phone: params.phone }, { email: params.email }] }).ne('status', 0);
       if (!user) {
@@ -58,22 +59,33 @@ class UserService extends Service {
       }
       const pwd = md5(params.password);
       if (pwd !== user.password) { return Object.assign(ERROR, { msg: '登录失败，密码错误' }); }
+      const exp = Math.round(new Date() / 1000) + (60 * 60 * 3);
+      const token = app.jwt.sign({
+        name: user.id,
+        iat: Math.round(new Date() / 1000),
+        exp,
+      }, app.config.jwt.secret);
       ctx.status = 201;
-      return Object.assign(SUCCESS, { msg: `${user.nickName} 登录成功，欢迎回来` });
+      return Object.assign(SUCCESS, { msg: `${user.nickName} 登录成功，欢迎回来`, token, exp });
     } catch (error) {
       ctx.status = 500;
       throw (error);
     }
   }
   // 用户个人信息
-  async information(params) {
-    const { ctx } = this;
+  async information() {
+    const { ctx, app } = this;
     try {
-      const user = await ctx.model.User.findOne({ $or: [{ phone: params.phone }, { email: params.email }] }, { _id: 0, password: 0 }).ne('status', 0);
-      if (!user) {
+      const results = jwt(app, ctx.request.header.authorization);
+      if (results[0]) {
         ctx.status = 400;
+        return Object.assign(ERROR, { msg: '请求失败' });
+      }
+      if (!results[3]) {
+        ctx.status = 403;
         return Object.assign(ERROR, { msg: '参数异常' });
       }
+      const user = await ctx.model.User.findOne({ id: results[3] }, { _id: 0, password: 0 }).ne('status', 0);
       ctx.status = 201;
       return Object.assign(SUCCESS, { msg: `${user.nickName}的个人信息返回成功`, data: user });
     } catch (error) {
@@ -83,8 +95,13 @@ class UserService extends Service {
   }
   // 用户所有信息
   async list(page) {
-    const { ctx } = this;
+    const { ctx, app } = this;
     try {
+      const results = jwt(app, ctx.request.header.authorization);
+      if (results[0]) {
+        ctx.status = 400;
+        return Object.assign(ERROR, { msg: '请求失败' });
+      }
       const { pageSize } = this.config.paginatorConfig;
       const total = await this.ctx.model.User.find({}).ne('status', 0).count();
       if (!total) {
@@ -110,9 +127,14 @@ class UserService extends Service {
   }
   // 修改用户个人信息
   async modify(params) {
-    const { ctx } = this;
+    const { ctx, app } = this;
     try {
-      const user = await ctx.model.User.findOne({ $or: [{ phone: params.phone }, { email: params.email }] }).ne('status', 0);
+      const results = jwt(app, ctx.request.header.authorization);
+      if (results[0]) {
+        ctx.status = 400;
+        return Object.assign(ERROR, { msg: '请求失败' });
+      }
+      const user = await ctx.model.User.findOne({ id: results[3] }).ne('status', 0);
       if (!user) {
         ctx.status = 400;
         return Object.assign(ERROR, { msg: '查无此账号，请前往创建或者联系管理员' });
@@ -148,21 +170,26 @@ class UserService extends Service {
   }
   // 恢复用户状态
   async recovery(params) {
-    const { ctx } = this;
+    const { ctx, app } = this;
     try {
-      const admin = await ctx.model.Admin.findOne({ name: params.name }).ne('deleted', 0);
-      if (!admin) {
-        ctx.status = 401;
-        return Object.assign(ERROR, { msg: `不存在该管理员${admin.name}` });
+      const results = jwt(app, ctx.request.header.authorization);
+      if (results[0]) {
+        ctx.status = 400;
+        return Object.assign(ERROR, { msg: '请求失败' });
       }
-      const user = await ctx.model.User.findOne({ id: params.id }).ne('status', 1);
+      const admin = await ctx.model.Admin.findOne({ name: results[3] });
+      if (!admin) {
+        ctx.status = 406;
+        return Object.assign(ERROR, { msg: '不存在该管理员' });
+      }
+      const user = await ctx.model.User.findOne({ id: params.id, status: 0 });
       if (!user) {
         ctx.status = 400;
         return Object.assign(ERROR, { msg: '查无此账号' });
       }
       await this.ctx.model.User.updateOne({ id: user.id }, { status: 1 });
       ctx.status = 201;
-      return Object.assign(SUCCESS, { msg: `${user.name}状态恢复正常，请告诉${user.name}` });
+      return Object.assign(SUCCESS, { msg: `用户${user.nickName}状态恢复正常，请告诉${user.nickName}` });
     } catch (error) {
       ctx.status = 500;
       throw (error);

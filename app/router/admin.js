@@ -17,6 +17,7 @@ module.exports = app => {
   router.post(`${adminApi}/information`, controller.admin.admin.information);
   router.put(`${adminApi}/information`, controller.admin.admin.modify);
   router.get(`${adminApi}/list`, controller.admin.admin.list);
+  router.delete(`${adminApi}/delete`, controller.admin.admin.delete)
 
   /**
    * 分类相关接口
@@ -37,4 +38,5 @@ module.exports = app => {
 
   const userApi = '/admin/user';
   router.get(`${userApi}/list`, controller.admin.user.list);
+  router.post(`${userApi}/recovery`, controller.admin.user.recovery);
 };

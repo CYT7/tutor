@@ -31,7 +31,7 @@ class AdminController extends Controller {
   // 管理员个人信息
   async information() {
     const { ctx } = this;
-    ctx.body = await ctx.service.admin.information(ctx.request.body);
+    ctx.body = await ctx.service.admin.information();
   }
   // 修改管理员个人信息
   async modify() {

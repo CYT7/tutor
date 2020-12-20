@@ -1,26 +1,36 @@
 /**
  * @author: Chen yt7
  * @date: 2020/12/12 2:30 PM
- * @modifyDate：2020/12/17 7：45PM
+ * @modifyDate：2020/12/20 4：00PM
  */
 'use strict';
 
 const Service = require('egg').Service;
 const md5 = require('js-md5');
-// const jwt = require('jwt');
+const jwt = require('../utils/jwt');
 const { ERROR, SUCCESS } = require('../utils/restful');
 
 class AdminService extends Service {
   // 创建管理员
   async create(params) {
-    const { ctx } = this;
+    const { ctx, app } = this;
     try {
-      const check = await ctx.model.Admin.findOne({ name: params.name }).ne('deleted', 0);
-      if (check) {
+      const results = jwt(app, ctx.request.header.authorization);
+      if (results[0]) {
         ctx.status = 400;
-        return Object.assign(ERROR, { msg: '用户名已经存在' });
+        return Object.assign(ERROR, { msg: '请求失败' });
       }
       const admin = await ctx.model.Admin.aggregate().sort({ id: -1 });
+      const check = await ctx.model.Admin.findOne({ id: admin[0].id + 1 });
+      if (check) {
+        ctx.status = 401;
+        return Object.assign(ERROR, { msg: '操作频繁,请稍后再试' });
+      }
+      const checkName = await ctx.model.Admin.findOne({ name: params.name }).ne('deleted', 0);
+      if (checkName) {
+        ctx.status = 402;
+        return Object.assign(ERROR, { msg: '管理员名已经存在' });
+      }
       const newAdmin = await ctx.model.Admin.create({
         id: admin[0].id + 1,
         name: params.name,
@@ -30,7 +40,7 @@ class AdminService extends Service {
       });
       newAdmin.save();
       ctx.status = 201;
-      return Object.assign(SUCCESS, { msg: `管理员${newAdmin.name}成功` });
+      return Object.assign(SUCCESS, { msg: `管理员${newAdmin.name}创建成功` });
     } catch (error) {
       ctx.status = 500;
       throw (error);
@@ -41,18 +51,18 @@ class AdminService extends Service {
     const { ctx, app } = this;
     try {
       if (!params.name && !params.password) {
-        ctx.status = 400;
+        ctx.status = 403;
         return Object.assign(ERROR, { msg: '参数异常' });
       }
       const checkAdmin = await ctx.model.Admin.findOne({ name: params.name, status: 1 }).ne('deleted', 0);
       if (!checkAdmin) {
-        ctx.status = 401;
-        return Object.assign(ERROR, { msg: `管理员${checkAdmin.name}被禁用或删除了，请联系超级管理员` });
+        ctx.status = 404;
+        return Object.assign(ERROR, { msg: `不存在管理员${checkAdmin.name}` });
       }
       const accountPwd = checkAdmin.password;
       const checkPwd = md5(params.password);
       if (accountPwd !== checkPwd) {
-        ctx.status = 402;
+        ctx.status = 405;
         return Object.assign(ERROR, { msg: '密码错误，请重新输入' });
       }
       const exp = Math.round(new Date() / 1000) + (60 * 60 * 3);
@@ -69,15 +79,19 @@ class AdminService extends Service {
     }
   }
   // 管理员个人信息
-  async information(params) {
-    const { ctx } = this;
+  async information() {
+    const { ctx, app } = this;
     try {
-      const admin = await ctx.model.Admin.findOne({ name: params.name }).ne('deleted', 0);
-      if (!admin) {
-        ctx.status = 401;
-        return Object.assign(ERROR, { msg: `不存在该管理员${admin.name}` });
+      const results = jwt(app, ctx.request.header.authorization);
+      if (results[0]) {
+        ctx.status = 400;
+        return Object.assign(ERROR, { msg: '请求失败' });
       }
-      const adminInformation = await ctx.model.Admin.findOne({ name: params.name }, { _id: 0, id: 0, password: 0 });
+      if (!results[3]) {
+        ctx.status = 403;
+        return Object.assign(ERROR, { msg: '参数异常' });
+      }
+      const adminInformation = await ctx.model.Admin.findOne({ name: results[3] }, { _id: 0, id: 0, password: 0 });
       ctx.status = 201;
       return Object.assign(SUCCESS, { msg: '管理员个人信息返回成功', data: adminInformation });
     } catch (error) {
@@ -87,12 +101,17 @@ class AdminService extends Service {
   }
   // 修改管理员个人信息
   async modify(params) {
-    const { ctx } = this;
+    const { ctx, app } = this;
     try {
-      const admin = await ctx.model.Admin.findOne({ name: params.name }).ne('deleted', 0);
+      const results = jwt(app, ctx.request.header.authorization);
+      if (results[0]) {
+        ctx.status = 400;
+        return Object.assign(ERROR, { msg: '请求失败' });
+      }
+      const admin = await ctx.model.Admin.findOne({ name: results[3] });
       if (!admin) {
-        ctx.status = 401;
-        return Object.assign(ERROR, { msg: `不存在该管理员${admin.name}` });
+        ctx.status = 406;
+        return Object.assign(ERROR, { msg: '不存在该管理员' });
       }
       const oldPwd = md5(params.oldPassword);
       if (oldPwd !== admin.password) { return Object.assign(ERROR, { msg: '旧密码输入错误，请重新输入' }); }
@@ -115,7 +134,7 @@ class AdminService extends Service {
         obj[k] = v;
       }
       obj.updateTime = Math.round(new Date() / 1000);
-      await this.ctx.model.Admin.updateOne({ name: params.name }, obj);
+      await this.ctx.model.Admin.updateOne({ name: admin.name }, obj);
       ctx.status = 201;
       return Object.assign(SUCCESS, { msg: `管理员${admin.name}信息修改成功` });
     } catch (error) {
@@ -125,8 +144,13 @@ class AdminService extends Service {
   }
 
   async list(page) {
-    const { ctx } = this;
+    const { ctx, app } = this;
     try {
+      const results = jwt(app, ctx.request.header.authorization);
+      if (results[0]) {
+        ctx.status = 400;
+        return Object.assign(ERROR, { msg: '请求失败' });
+      }
       const { pageSize } = this.config.paginatorConfig;
       const total = await this.ctx.model.Admin.find({}).ne('deleted', 0).count();
       if (!total) {
@@ -152,16 +176,21 @@ class AdminService extends Service {
   }
   // 删除管理员
   async delete(params) {
-    const { ctx } = this;
+    const { ctx, app } = this;
     try {
-      const admin = await ctx.model.Admin.findOne({ name: params.name }).ne('deleted', 0);
+      const results = jwt(app, ctx.request.header.authorization);
+      if (results[0]) {
+        ctx.status = 400;
+        return Object.assign(ERROR, { msg: '请求失败' });
+      }
+      const admin = await ctx.model.Admin.findOne({ name: results[3] });
       if (!admin) {
-        ctx.status = 401;
-        return Object.assign(ERROR, { msg: `不存在该管理员${admin.name}` });
+        ctx.status = 406;
+        return Object.assign(ERROR, { msg: '不存在该管理员' });
       }
       const check = await ctx.model.Admin.findOne({ id: params.id }).ne('deleted', 0);
       if (!check) {
-        ctx.status = 401;
+        ctx.status = 407;
         return Object.assign(ERROR, { msg: `该管理员${check.name}不存在或已经被软删除了` });
       }
       await this.ctx.model.Admin.updateOne({ id: check.id }, { deleted: 0 });
