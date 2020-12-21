@@ -36,7 +36,18 @@ module.exports = app => {
   router.post(`${teacherApi}/disagree`, controller.admin.teacher.disagree);
   router.get(`${teacherApi}/list`, controller.admin.teacher.list);
 
+  /**
+   * 用户相关接口
+   */
   const userApi = '/admin/user';
   router.get(`${userApi}/list`, controller.admin.user.list);
   router.post(`${userApi}/recovery`, controller.admin.user.recovery);
+
+  /**
+   * 需求相关接口
+   */
+  const needApi = '/admin/need';
+  router.get(`${needApi}/list`, controller.admin.need.list);
+  router.post(`${needApi}/agree`, controller.admin.need.agree);
+  router.post(`${needApi}/disagree`, controller.admin.need.disagree);
 };

@@ -31,4 +31,10 @@ module.exports = app => {
   const needApi = '/business/need';
   router.post(`${needApi}/create`, controller.business.need.create);
   router.post(`${needApi}/apply`, controller.business.need.apply);
+  router.post(`${needApi}/confirm`, controller.business.need.confirm);
+  router.post(`${needApi}/finish`, controller.business.need.finish);
+  router.post(`${needApi}/information`, controller.business.need.information);
+  router.post(`${needApi}/close`, controller.business.need.close);
+  router.put(`${needApi}/modify`, controller.business.need.modify);
+  router.get(`${needApi}/list`, controller.business.need.list);
 };
