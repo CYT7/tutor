@@ -1,6 +1,7 @@
 /**
  * @author: Chen yt7
  * @date: 2020/12/15 1:03 PM
+ * @modifyDate：2020/12/21 12：25AM
  */
 'use strict';
 
@@ -74,12 +75,17 @@ class TeacherService extends Service {
   }
   // 修改家教个人信息
   async modify(params) {
-    const { ctx } = this;
+    const { ctx, app } = this;
     try {
-      const user = await ctx.model.User.findOne({ $or: [{ phone: params.phone }, { email: params.email }] }).ne('status', 0);
+      const results = jwt(app, ctx.request.header.authorization);
+      if (results[0]) {
+        ctx.status = 400;
+        return Object.assign(ERROR, { msg: '请求失败' });
+      }
+      const user = await ctx.model.User.findOne({ id: results[3] }).ne('status', 0);
       if (!user) {
         ctx.status = 400;
-        return Object.assign(ERROR, { msg: '查无此账号，请前往创建或者联系管理员' });
+        return Object.assign(ERROR, { msg: '查无此账号' });
       }
       const teacher = await ctx.model.Teacher.findOne({ User: user });
       if (!teacher) { return Object.assign(ERROR, { msg: '你尚未申请做家教，请前往申请' }); }
@@ -110,20 +116,25 @@ class TeacherService extends Service {
   }
   // 管理员审核通过
   async agree(params) {
-    const { ctx } = this;
+    const { ctx, app } = this;
     try {
-      const admin = await ctx.model.Admin.findOne({ name: params.name });
-      if (!admin) {
-        ctx.status = 401;
-        return Object.assign(ERROR, { msg: '管理员账号不存在' });
+      const results = jwt(app, ctx.request.header.authorization);
+      if (results[0]) {
+        ctx.status = 400;
+        return Object.assign(ERROR, { msg: '请求失败' });
       }
-      const teacher = await ctx.model.Teacher.findOne({ id: params.id }).ne('status', 0);
+      const admin = await ctx.model.Admin.findOne({ name: results[3] });
+      if (!admin) {
+        ctx.status = 406;
+        return Object.assign(ERROR, { msg: '不存在该管理员' });
+      }
+      const teacher = await ctx.model.Teacher.findOne({ id: params.id, state: 1 }).populate({ path: 'User', select: 'nickName' }).ne('status', 0);
       if (!teacher) {
-        return Object.assign((ERROR, { msg: '不存在该老师，参数异常' }));
+        return Object.assign(ERROR, { msg: '不存在该老师，参数异常' });
       }
       await this.ctx.model.Teacher.updateOne({ id: teacher.id }, { state: 3 });
       ctx.status = 201;
-      return Object.assign(SUCCESS, { msg: `${teacher.User}审核通过` });
+      return Object.assign(SUCCESS, { msg: `${teacher.User.nickName}审核通过` });
     } catch (error) {
       ctx.status = 500;
       throw (error);
@@ -131,20 +142,25 @@ class TeacherService extends Service {
   }
   // 管理员审核不通过
   async disagree(params) {
-    const { ctx } = this;
+    const { ctx, app } = this;
     try {
-      const admin = await ctx.model.Admin.findOne({ name: params.name });
-      if (!admin) {
-        ctx.status = 401;
-        return Object.assign(ERROR, { msg: '管理员账号不存在' });
+      const results = jwt(app, ctx.request.header.authorization);
+      if (results[0]) {
+        ctx.status = 400;
+        return Object.assign(ERROR, { msg: '请求失败' });
       }
-      const teacher = await ctx.model.Teacher.findOne({ id: params.id }).ne('status', 0);
+      const admin = await ctx.model.Admin.findOne({ name: results[3] });
+      if (!admin) {
+        ctx.status = 406;
+        return Object.assign(ERROR, { msg: '不存在该管理员' });
+      }
+      const teacher = await ctx.model.Teacher.findOne({ id: params.id, state: 1 }).populate({ path: 'User', select: 'nickName' }).ne('status', 0);
       if (!teacher) {
         return Object.assign((ERROR, { msg: '不存在该老师，参数异常' }));
       }
       await this.ctx.model.Teacher.updateOne({ id: teacher.id }, { state: 2 });
       ctx.status = 201;
-      return Object.assign(SUCCESS, { msg: `${teacher.User}审核不通过` });
+      return Object.assign(SUCCESS, { msg: `${teacher.User.nickName}审核不通过` });
     } catch (error) {
       ctx.status = 500;
       throw (error);
@@ -152,8 +168,13 @@ class TeacherService extends Service {
   }
   // 所有教师信息列表
   async list(page) {
-    const { ctx } = this;
+    const { ctx, app } = this;
     try {
+      const results = jwt(app, ctx.request.header.authorization);
+      if (results[0]) {
+        ctx.status = 400;
+        return Object.assign(ERROR, { msg: '请求失败' });
+      }
       const { pageSize } = this.config.paginatorConfig;
       const total = await this.ctx.model.Teacher.find({}).count();
       if (!total) {
@@ -163,7 +184,7 @@ class TeacherService extends Service {
       const totals = Math.ceil(total / pageSize);
       if (page > totals) { return [ -2, '无效页码' ]; }
       if (page < 1) { page = 1; }
-      const result = await this.ctx.model.Teacher.find({}).skip((page - 1) * pageSize).limit(pageSize);
+      const result = await this.ctx.model.Teacher.find({}).populate({ path: 'User', select: { _id: 0, password: 0, id: 0 } }).skip((page - 1) * pageSize).limit(pageSize);
       if (!Number(page)) {
         page = 1;
       } else {
