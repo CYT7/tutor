@@ -50,4 +50,12 @@ module.exports = app => {
   router.get(`${needApi}/list`, controller.admin.need.list);
   router.post(`${needApi}/agree`, controller.admin.need.agree);
   router.post(`${needApi}/disagree`, controller.admin.need.disagree);
+
+  /**
+   * 预约相关接口
+   */
+  const appointApi = '/admin/appoint';
+  router.get(`${appointApi}/list`, controller.admin.appoint.list);
+
+
 };

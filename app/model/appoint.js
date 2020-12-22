@@ -9,7 +9,7 @@ module.exports = app => {
   const Schema = mongoose.Schema;
 
   const AppointSchema = new Schema({
-    id: Number,
+    id: { type: String },
     need: { type: Schema.Types.ObjectId, ref: 'Need' }, // 需求id
     student: { type: Schema.Types.ObjectId, ref: 'User' }, // 家长id
     teacher: { type: Schema.Types.ObjectId, ref: 'Teacher' }, // 老师id

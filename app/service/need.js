@@ -38,6 +38,7 @@ class NeedService extends Service {
         frequency: params.frequency,
         timeHour: params.timeHour,
         hourPrice: params.hourPrice,
+        subject: params.subject,
         createTime: Math.round(new Date() / 1000),
       });
       need.totalPrice = need.frequency * need.timeHour * need.hourPrice;
@@ -169,8 +170,25 @@ class NeedService extends Service {
       const need = await ctx.model.Need.findOne({ id: params.id, state: 3 });
       if (!need) { return Object.assign(ERROR, { msg: '查无此需求' }); }
       const teacher = await ctx.model.Teacher.findOne({ id: params.teacherId }).ne('status', 0);
-      if (!teacher) { return Object.assign(ERROR, { msg: '查无此需求' }); }
+      if (!teacher) { return Object.assign(ERROR, { msg: '查无此老师' }); }
       await this.ctx.model.Need.updateOne({ id: need.id }, { state: 4, total_appoint: params.teacherId });
+      await this.ctx.model.Appoint.create({
+        id: md5(Math.random().toString(36).substr(3, 5)),
+        need,
+        student: user,
+        teacher,
+        frequency: need.frequency,
+        timeHour: need.timeHour,
+        hourPrice: need.hourPrice,
+        totalPrice: need.totalPrice,
+        name: need.nickName,
+        phone: need.phone,
+        qq: need.qq,
+        wechat: need.wechat,
+        address: need.address,
+        subject: need.subject,
+        createTime: Math.round(new Date() / 1000),
+      });
       ctx.status = 201;
       return Object.assign(SUCCESS, { msg: '此需求已经选定老师' });
     } catch (error) {

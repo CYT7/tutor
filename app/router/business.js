@@ -37,4 +37,13 @@ module.exports = app => {
   router.post(`${needApi}/close`, controller.business.need.close);
   router.put(`${needApi}/modify`, controller.business.need.modify);
   router.get(`${needApi}/list`, controller.business.need.list);
+
+  /**
+   * 预约相关接口
+   **/
+  const appointApi = '/business/appoint';
+  router.post(`${appointApi}/see`, controller.business.appoint.see);
+  router.post(`${appointApi}/finish`, controller.business.appoint.finish);
+  router.post(`${appointApi}/close`, controller.business.appoint.close);
+  router.get(`${appointApi}/list`, controller.business.appoint.list);
 };

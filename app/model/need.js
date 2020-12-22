@@ -22,6 +22,7 @@ module.exports = app => {
     teacherComment: { type: Number, default: 0 }, // 老师是否已评论 0未评论 1已评论
     address: { type: String, default: null }, // 地址
     teach_date: { type: String, default: null }, // 上课时间
+    subject: { type: String, default: null }, // 科目
     total_appoint: { type: Array, default: null }, // 预约人数
     frequency: { type: Number, default: 0 }, // 总共几次(必选)
     timeHour: { type: Number, default: 0 }, // 每次几小时(必选)
