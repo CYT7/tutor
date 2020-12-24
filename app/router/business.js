@@ -46,4 +46,12 @@ module.exports = app => {
   router.post(`${appointApi}/finish`, controller.business.appoint.finish);
   router.post(`${appointApi}/close`, controller.business.appoint.close);
   router.get(`${appointApi}/list`, controller.business.appoint.list);
+
+  /**
+   * 评论相关接口
+   **/
+  const commentApi = '/business/comment';
+  router.post(`${commentApi}/generate`, controller.business.comment.generate);
+  router.post(`${commentApi}/see`, controller.business.comment.see);
+  router.get(`${commentApi}/list`, controller.business.comment.list);
 };

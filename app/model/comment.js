@@ -9,9 +9,9 @@ module.exports = app => {
   const Schema = mongoose.Schema;
 
   const CommentSchema = new Schema({
-    id: Number,
-    formId: { type: Number, default: 0 }, // 学生id 评论人
-    toId: { type: Number, default: 0 }, // 老师id 被评论者
+    id: { type: String },
+    formId: { type: Number, default: null }, // 学生 评论人
+    toId: { type: String, default: null }, // 老师 被评论者
     need: { type: Schema.Types.ObjectId, ref: 'Need' }, // 评论给哪个需求
     appoint: { type: Schema.Types.ObjectId, ref: 'Appoint' }, // 评论给哪个预约
     content: { type: String, default: null }, // 评论内容
