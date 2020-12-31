@@ -202,5 +202,29 @@ class AdminService extends Service {
     }
   }
 
+  // 管理员dashboard
+  async dashboard() {
+    const { ctx, app } = this;
+    try {
+      const results = jwt(app, ctx.request.header.authorization);
+      if (results[0]) {
+        ctx.status = 400;
+        return Object.assign(ERROR, { msg: '请求失败' });
+      }
+      const admin = await ctx.model.Admin.findOne({ name: results[3] });
+      if (!admin) {
+        ctx.status = 406;
+        return Object.assign(ERROR, { msg: '不存在该管理员' });
+      }
+      const adminCount = await ctx.model.Admin.find({ deleted: 1 }).count();
+      const userCount = await ctx.model.User.find({ status: 1 }).count();
+      ctx.status = 201;
+      return Object.assign(SUCCESS, { msg: '信息返回成功', adminCount, userCount });
+    } catch (error) {
+      ctx.status = 500;
+      throw (error);
+    }
+  }
+
 }
 module.exports = AdminService;

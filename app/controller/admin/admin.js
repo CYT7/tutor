@@ -38,6 +38,11 @@ class AdminController extends Controller {
     const { ctx } = this;
     ctx.body = await ctx.service.admin.modify(ctx.request.body);
   }
+  // 管理员dashboard
+  async index(){
+    const { ctx } = this;
+    ctx.body = await ctx.service.admin.dashboard();
+  }
 }
 
 module.exports = AdminController;

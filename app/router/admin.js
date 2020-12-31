@@ -17,7 +17,9 @@ module.exports = app => {
   router.post(`${adminApi}/information`, controller.admin.admin.information);
   router.put(`${adminApi}/information`, controller.admin.admin.modify);
   router.get(`${adminApi}/list`, controller.admin.admin.list);
-  router.delete(`${adminApi}/delete`, controller.admin.admin.delete)
+  router.get(`${adminApi}/index`, controller.admin.admin.index);
+  router.delete(`${adminApi}/delete`, controller.admin.admin.delete);
+
 
   /**
    * 分类相关接口
