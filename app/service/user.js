@@ -9,6 +9,9 @@ const Service = require('egg').Service;
 const md5 = require('js-md5');
 const jwt = require('../utils/jwt');
 const { ERROR, SUCCESS } = require('../utils/restful');
+const path = require('path');
+const sd = require('silly-datetime');
+const mkdirp = require('mkdirp');
 
 class UserService extends Service {
   // 创建用户
@@ -139,7 +142,7 @@ class UserService extends Service {
         ctx.status = 400;
         return Object.assign(ERROR, { msg: '查无此账号' });
       }
-      if (params.oldPassword){
+      if (params.oldPassword) {
         const oldPwd = md5(params.oldPassword);
         if (oldPwd !== user.password) { return Object.assign(ERROR, { msg: '旧密码输入错误，请重新输入' }); }
         params.password = md5(params.newPassword);
@@ -192,6 +195,38 @@ class UserService extends Service {
       await this.ctx.model.User.updateOne({ id: params.id }, { status: 1 });
       ctx.status = 201;
       return Object.assign(SUCCESS, { msg: `用户${user.nickName}状态恢复正常，请告诉${user.nickName}` });
+    } catch (error) {
+      ctx.status = 500;
+      throw (error);
+    }
+  }
+
+  async saveAvatar(filename) {
+    const { ctx, app } = this;
+    try {
+      const results = jwt(app, ctx.request.header.authorization);
+      if (results[0]) {
+        ctx.status = 400;
+        return Object.assign(ERROR, { msg: '请求失败' });
+      }
+      const user = await ctx.model.User.findOne({ id: results[3] }).ne('status', 0);
+      if (!user) {
+        ctx.status = 400;
+        return Object.assign(ERROR, { msg: '查无此账号' });
+      }
+      const day = sd.format(new Date(), 'YYYYMMDD');// 获取当前日期
+      const dir = path.join(this.config.uploadDir, day);// 创建图片保存的路径
+      await mkdirp(dir);// 不存在就创建目录
+      const date = Date.now();// 毫秒数
+      const uploadDir = path.join(dir, date + path.extname(filename));
+      const saveDir = this.ctx.origin + uploadDir.slice(3).replace(/\\/g, '/');
+      await this.ctx.model.User.updateOne({ id: results[3] }, { image_url: saveDir });
+      ctx.status = 201;
+      return {
+        uploadDir,
+        saveDir,
+      };
+
     } catch (error) {
       ctx.status = 500;
       throw (error);

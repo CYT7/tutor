@@ -49,6 +49,7 @@ module.exports = appInfo => {
   config.paginatorConfig = {
     pageSize: 12,
   };
+  config.uploadDir = 'app/public/static/upload';
 
   config.jwt = {
     secret: 'nPp1rYeZhq2HNfD3AO}I0aGV+Z^5/-LM~Wu7S&ejxKlJwiE4Fve+B8dgCXtQyUbs9oR6cT*k',
