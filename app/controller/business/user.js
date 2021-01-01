@@ -53,15 +53,13 @@ class UserController extends Controller {
     }
     if (Object.keys(files).length > 0) {
       ctx.body = {
-        code: 200,
+        code: 201,
         message: '用户上传头像成功',
-        data: files,
       };
     } else {
       ctx.body = {
         code: 500,
         message: '用户上传头像失败',
-        data: {},
       };
     }
   }
