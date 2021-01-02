@@ -71,8 +71,8 @@ class AdminService extends Service {
         iat: Math.round(new Date() / 1000),
         exp,
       }, app.config.jwt.secret);
-      ctx.status = 201;
-      return Object.assign(SUCCESS, { msg: `${checkAdmin.name} 登录成功，欢迎回来`, token, exp });
+      return [ `${checkAdmin.name} 登录成功，欢迎回来`, token, exp ];
+      // return Object.assign(SUCCESS, { msg: `${checkAdmin.name} 登录成功，欢迎回来`, token, exp });
     } catch (error) {
       ctx.status = 500;
       throw (error);

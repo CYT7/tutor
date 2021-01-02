@@ -16,7 +16,7 @@ class AdminController extends Controller {
   // 删除管理员
   async delete() {
     const { ctx } = this;
-    ctx.body = await ctx.service.admin.delete (ctx.request.body);
+    ctx.body = await ctx.service.admin.delete(ctx.request.body);
   }
   // 所有管理员的信息
   async list() {
@@ -25,8 +25,13 @@ class AdminController extends Controller {
   }
   // 管理员登录
   async login() {
-    const { ctx } = this;
-    ctx.body = await ctx.service.admin.login(ctx.request.body);
+    const { ctx, service } = this;
+    const res = await service.admin.login(ctx.request.body);
+    if (res) {
+      ctx.body = { code: 0, msg: res[0], token: res[1], exp: res[2]};
+    } else {
+      ctx.body = { code: 404, msg: res[0] };
+    }
   }
   // 管理员个人信息
   async information() {
@@ -39,7 +44,7 @@ class AdminController extends Controller {
     ctx.body = await ctx.service.admin.modify(ctx.request.body);
   }
   // 管理员dashboard
-  async index(){
+  async index() {
     const { ctx } = this;
     ctx.body = await ctx.service.admin.dashboard();
   }
