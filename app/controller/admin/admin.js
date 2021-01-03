@@ -28,7 +28,7 @@ class AdminController extends Controller {
     const { ctx, service } = this;
     const res = await service.admin.login(ctx.request.body);
     if (res) {
-      ctx.body = { code: 0, msg: res[0], token: res[1], exp: res[2]};
+      ctx.body = { code: 0, msg: res[0], token: res[1] };
     } else {
       ctx.body = { code: 404, msg: res[0] };
     }
