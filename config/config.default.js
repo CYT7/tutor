@@ -27,9 +27,13 @@ module.exports = appInfo => {
     csrf: {
       enable: false,
     },
-    domainWhiteList: [ '*' ],
+    domainWhiteList: [ '*' ], // 允许访问接口的白名单
   };
-
+  // 跨域配置
+  config.cors = {
+    origin: '*',
+    allowMethods: 'GET,HEAD,PUT,POST,DELETE,PATCH,OPTIONS',
+  };
   // MongoDB config
   config.mongoose = {
     client: {
@@ -45,12 +49,10 @@ module.exports = appInfo => {
       agent: false,
     },
   };
-
   config.paginatorConfig = {
     pageSize: 12,
   };
   config.uploadDir = 'app/public/static/upload';
-
   config.jwt = {
     secret: 'nPp1rYeZhq2HNfD3AO}I0aGV+Z^5/-LM~Wu7S&ejxKlJwiE4Fve+B8dgCXtQyUbs9oR6cT*k',
   };

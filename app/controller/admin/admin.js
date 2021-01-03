@@ -10,8 +10,13 @@ const Controller = require('egg').Controller;
 class AdminController extends Controller {
   // 管理员创建
   async create() {
-    const { ctx } = this;
-    ctx.body = await ctx.service.admin.create(ctx.request.body);
+    const { ctx, service } = this;
+    const res = await service.admin.create(ctx.request.body);
+    if (res) {
+      ctx.body = { code: res[0], msg: res[1], token: res[2] };
+    } else {
+      ctx.body = { code: 404002, msg: res[1] };
+    }
   }
   // 删除管理员
   async delete() {
@@ -28,15 +33,22 @@ class AdminController extends Controller {
     const { ctx, service } = this;
     const res = await service.admin.login(ctx.request.body);
     if (res) {
-      ctx.body = { code: 0, msg: res[0], token: res[1] };
+      ctx.body = { code: res[0], msg: res[1], token: res[2] };
     } else {
-      ctx.body = { code: 404, msg: res[0] };
+      ctx.body = { code: 404001, msg: res[1] };
     }
+    ctx.status = 201;
   }
   // 管理员个人信息
   async information() {
-    const { ctx } = this;
-    ctx.body = await ctx.service.admin.information();
+    const { ctx, service } = this;
+    const res = await service.admin.information();
+    if (res) {
+      ctx.body = { code: res[0], msg: res[1], data: res[2], token: res[3] };
+    } else {
+      ctx.body = { code: 404003, msg: res[1] };
+    }
+    ctx.status = 201;
   }
   // 修改管理员个人信息
   async modify() {
