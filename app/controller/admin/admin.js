@@ -17,16 +17,29 @@ class AdminController extends Controller {
     } else {
       ctx.body = { code: 404002, msg: res[1] };
     }
+    ctx.status = 201;
   }
   // 删除管理员
   async delete() {
-    const { ctx } = this;
-    ctx.body = await ctx.service.admin.delete(ctx.request.body);
+    const { ctx, service } = this;
+    const res = await service.admin.delete(ctx.request.body);
+    if (res) {
+      ctx.body = { code: res[0], msg: res[1] };
+    } else {
+      ctx.body = { code: 404002, msg: res[1] };
+    }
+    ctx.status = 201;
   }
   // 所有管理员的信息
   async list() {
-    const { ctx } = this;
-    ctx.body = await ctx.service.admin.list(ctx.request.query.page);
+    const { ctx, service } = this;
+    const res = await service.admin.list(ctx.request.query.page);
+    if (res) {
+      ctx.body = { code: res[0], msg: res[1], data: res[2], totals: res[3], page: res[4] };
+    } else {
+      ctx.body = { code: 404002, msg: res[1] };
+    }
+    ctx.status = 201;
   }
   // 管理员登录
   async login() {
@@ -52,13 +65,25 @@ class AdminController extends Controller {
   }
   // 修改管理员个人信息
   async modify() {
-    const { ctx } = this;
-    ctx.body = await ctx.service.admin.modify(ctx.request.body);
+    const { ctx, service } = this;
+    const res = await service.admin.modify(ctx.request.body);
+    if (res) {
+      ctx.body = { code: res[0], msg: res[1], data: res[2], token: res[3] };
+    } else {
+      ctx.body = { code: 404003, msg: res[1] };
+    }
+    ctx.status = 201;
   }
   // 管理员dashboard
   async index() {
-    const { ctx } = this;
-    ctx.body = await ctx.service.admin.dashboard();
+    const { ctx, service } = this;
+    const res = await service.admin.dashboard();
+    if (res) {
+      ctx.body = { code: res[0], msg: res[1], adminCount: res[2], userCount: res[3] };
+    } else {
+      ctx.body = { code: 404003, msg: res[1] };
+    }
+    ctx.status = 201;
   }
 }
 

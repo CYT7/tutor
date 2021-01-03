@@ -8,7 +8,6 @@
 const Service = require('egg').Service;
 const md5 = require('js-md5');
 const jwt = require('../utils/jwt');
-const { ERROR, SUCCESS } = require('../utils/restful');
 
 class AdminService extends Service {
   // 创建管理员
