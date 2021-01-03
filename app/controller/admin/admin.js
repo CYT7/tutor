@@ -19,6 +19,17 @@ class AdminController extends Controller {
     }
     ctx.status = 201;
   }
+  // 管理员dashboard
+  async index() {
+    const { ctx, service } = this;
+    const res = await service.admin.dashboard();
+    if (res) {
+      ctx.body = { code: res[0], msg: res[1], adminCount: res[2], userCount: res[3] };
+    } else {
+      ctx.body = { code: 404003, msg: res[1] };
+    }
+    ctx.status = 201;
+  }
   // 删除管理员
   async delete() {
     const { ctx, service } = this;
@@ -26,7 +37,7 @@ class AdminController extends Controller {
     if (res) {
       ctx.body = { code: res[0], msg: res[1] };
     } else {
-      ctx.body = { code: 404002, msg: res[1] };
+      ctx.body = { code: 404004, msg: res[1] };
     }
     ctx.status = 201;
   }
@@ -37,7 +48,7 @@ class AdminController extends Controller {
     if (res) {
       ctx.body = { code: res[0], msg: res[1], data: res[2], totals: res[3], page: res[4] };
     } else {
-      ctx.body = { code: 404002, msg: res[1] };
+      ctx.body = { code: 404005, msg: res[1] };
     }
     ctx.status = 201;
   }
@@ -59,7 +70,7 @@ class AdminController extends Controller {
     if (res) {
       ctx.body = { code: res[0], msg: res[1], data: res[2], token: res[3] };
     } else {
-      ctx.body = { code: 404003, msg: res[1] };
+      ctx.body = { code: 404006, msg: res[1] };
     }
     ctx.status = 201;
   }
@@ -70,18 +81,7 @@ class AdminController extends Controller {
     if (res) {
       ctx.body = { code: res[0], msg: res[1], data: res[2], token: res[3] };
     } else {
-      ctx.body = { code: 404003, msg: res[1] };
-    }
-    ctx.status = 201;
-  }
-  // 管理员dashboard
-  async index() {
-    const { ctx, service } = this;
-    const res = await service.admin.dashboard();
-    if (res) {
-      ctx.body = { code: res[0], msg: res[1], adminCount: res[2], userCount: res[3] };
-    } else {
-      ctx.body = { code: 404003, msg: res[1] };
+      ctx.body = { code: 404007, msg: res[1] };
     }
     ctx.status = 201;
   }
