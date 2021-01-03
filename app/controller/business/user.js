@@ -36,31 +36,20 @@ class UserController extends Controller {
     let files = {};
     let stream;
     while ((stream = await parts()) != null) {
-      if (!stream.filename) {
-        break;
-      }
+      if (!stream.filename) { break; }
       const fieldname = stream.fieldname; // file表单的名字
-      // 上传图片的目录
-      const dir = await this.service.user.saveAvatar(stream.filename);
+      const dir = await this.service.user.saveAvatar(stream.filename);// 上传图片的目录
       const target = dir.uploadDir;
       const file = dir.saveDir;
       await this.service.user.saveAvatar(file);
       const writeStream = fs.createWriteStream(target);
       await pump(stream, writeStream);
-      files = Object.assign(files, {
-        [fieldname]: dir.saveDir,
-      });
+      files = Object.assign(files, { [fieldname]: dir.saveDir });
     }
     if (Object.keys(files).length > 0) {
-      ctx.body = {
-        code: 201,
-        message: '用户上传头像成功',
-      };
+      ctx.body = { code: 201, message: '用户上传头像成功' };
     } else {
-      ctx.body = {
-        code: 500,
-        message: '用户上传头像失败',
-      };
+      ctx.body = { code: 500, message: '用户上传头像失败' };
     }
   }
 }
