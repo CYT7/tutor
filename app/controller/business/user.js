@@ -12,22 +12,43 @@ class UserController extends Controller {
   // 创建用户
   async create() {
     const { ctx } = this;
-    ctx.body = await ctx.service.user.create(ctx.request.body);
+    const res = await ctx.service.user.create(ctx.request.body);
+    ctx.status = 201;
+    if (res) {
+      ctx.body = { code: res[0], msg: res[1] };
+    } else {
+      ctx.body = { code: res[0], msg: res[1] };
+    }
   }
   // 用户登录
   async login() {
     const { ctx } = this;
-    ctx.body = await ctx.service.user.login(ctx.request.body);
+    const res = await ctx.service.user.login(ctx.request.body);
+    if (res) {
+      ctx.body = { code: res[0], msg: res[1], token: res[2], exp: res[3] };
+    } else {
+      ctx.body = { code: res[0], msg: res[1] };
+    }
   }
   // 用户个人信息
   async information() {
     const { ctx } = this;
-    ctx.body = await ctx.service.user.information(ctx.request.body);
+    const res = await ctx.service.user.information(ctx.request.body);
+    if (res) {
+      ctx.body = { code: res[0], msg: res[1], token: res[2], exp: res[3] };
+    } else {
+      ctx.body = { code: res[0], msg: res[1] };
+    }
   }
   // 修改用户个人信息
   async modify() {
     const { ctx } = this;
-    ctx.body = await ctx.service.user.modify(ctx.request.body);
+    const res = await ctx.service.user.modify(ctx.request.body);
+    if (res) {
+      ctx.body = { code: res[0], msg: res[1], token: res[2], exp: res[3] };
+    } else {
+      ctx.body = { code: res[0], msg: res[1] };
+    }
   }
   // 保存头像
   async saveAvatar() {
@@ -47,9 +68,9 @@ class UserController extends Controller {
       files = Object.assign(files, { [fieldname]: dir.saveDir });
     }
     if (Object.keys(files).length > 0) {
-      ctx.body = { code: 201, message: '用户上传头像成功' };
+      ctx.body = { code: 0, message: '用户上传头像成功' };
     } else {
-      ctx.body = { code: 500, message: '用户上传头像失败' };
+      ctx.body = { code: 400404, message: '用户上传头像失败' };
     }
   }
 }
