@@ -13,7 +13,7 @@ class AdminController extends Controller {
     const { ctx, service } = this;
     const res = await service.admin.create(ctx.request.body);
     if (res) {
-      ctx.body = { code: res[0], msg: res[1], token: res[2] };
+      ctx.body = { code: res[0], msg: res[1], token: res[2], exp: res[3] };
     } else {
       ctx.body = { code: 404002, msg: res[1] };
     }
@@ -35,7 +35,7 @@ class AdminController extends Controller {
     const { ctx, service } = this;
     const res = await service.admin.delete(ctx.request.body);
     if (res) {
-      ctx.body = { code: res[0], msg: res[1] };
+      ctx.body = { code: res[0], msg: res[1], token: res[2], exp: res[3]  };
     } else {
       ctx.body = { code: 404004, msg: res[1] };
     }
@@ -46,7 +46,7 @@ class AdminController extends Controller {
     const { ctx, service } = this;
     const res = await service.admin.list(ctx.request.query.page);
     if (res) {
-      ctx.body = { code: res[0], msg: res[1], data: res[2], totals: res[3], page: res[4] };
+      ctx.body = { code: res[0], msg: res[1], data: res[2], totals: res[3], page: res[4], token: res[5], exp: res[6] };
     } else {
       ctx.body = { code: 404005, msg: res[1] };
     }
@@ -57,7 +57,7 @@ class AdminController extends Controller {
     const { ctx, service } = this;
     const res = await service.admin.login(ctx.request.body);
     if (res) {
-      ctx.body = { code: res[0], msg: res[1], token: res[2] };
+      ctx.body = { code: res[0], msg: res[1], token: res[2], exp: res[3] };
     } else {
       ctx.body = { code: 404001, msg: res[1] };
     }
@@ -68,7 +68,7 @@ class AdminController extends Controller {
     const { ctx, service } = this;
     const res = await service.admin.information();
     if (res) {
-      ctx.body = { code: res[0], msg: res[1], data: res[2], token: res[3] };
+      ctx.body = { code: res[0], msg: res[1], data: res[2], token: res[3], exp: res[4] };
     } else {
       ctx.body = { code: 404006, msg: res[1] };
     }
@@ -79,7 +79,7 @@ class AdminController extends Controller {
     const { ctx, service } = this;
     const res = await service.admin.modify(ctx.request.body);
     if (res) {
-      ctx.body = { code: res[0], msg: res[1], data: res[2], token: res[3] };
+      ctx.body = { code: res[0], msg: res[1], data: res[2], token: res[3], exp: res[4] };
     } else {
       ctx.body = { code: 404007, msg: res[1] };
     }

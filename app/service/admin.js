@@ -28,7 +28,7 @@ class AdminService extends Service {
       createTime: Math.round(new Date() / 1000),
     });
     newAdmin.save();
-    return [ 0, `管理员${newAdmin.name}创建成功` ];
+    return [ 0, `管理员${newAdmin.name}创建成功`, results[1], results[2] ];
   }
   // 管理员登录
   async login(params) {
@@ -47,7 +47,7 @@ class AdminService extends Service {
       iat: Math.round(new Date() / 1000),
       exp,
     }, app.config.jwt.secret);
-    return [ 0, `${checkAdmin.name} 登录成功，欢迎回来`, token ];
+    return [ 0, `${checkAdmin.name} 登录成功，欢迎回来`, token, exp ];
   }
   // 管理员个人信息
   async information() {
@@ -57,7 +57,7 @@ class AdminService extends Service {
     if (!results[3]) { return [ -3, '参数异常' ]; }
     const adminInformation = await ctx.model.Admin.findOne({ name: results[3] }, { _id: 0, password: 0 });
     ctx.status = 201;
-    return [ 0, '管理员个人信息返回成功', adminInformation, results[1] ];
+    return [ 0, '管理员个人信息返回成功', adminInformation, results[1], results[2] ];
   }
   // 修改管理员个人信息
   async modify(params) {
@@ -66,12 +66,14 @@ class AdminService extends Service {
     if (results[0]) { return [ -4, '请求失败' ]; }
     const admin = await ctx.model.Admin.findOne({ name: results[3] });
     if (!admin) { return [ -2, '管理员不存在' ]; }
-    const oldPwd = md5(params.oldPassword);
-    if (oldPwd !== admin.password) { return [ -1, '旧密码输入错误，请重新输入' ]; }
+    if (params.oldPassword && params.newPassword) {
+      const oldPwd = md5(params.oldPassword);
+      if (oldPwd !== admin.password) { return [ -1, '旧密码输入错误，请重新输入' ]; }
+      params.password = md5(params.newPassword);
+      if (oldPwd === params.password) { return [ -1, '新密码不能和旧密码一模一样，请重新输入' ]; }
+    }
     const checkParams = [ 'realname', 'password' ];
     const newData = new Map();
-    params.password = md5(params.newPassword);
-    if (oldPwd === params.password) { return [ -1, '新密码不能和旧密码一模一样，请重新输入' ]; }
     const paramMap = new Map(Object.entries(params));
     const newAdmin = new Map(Object.entries(admin.toObject()));
     for (const k of paramMap.keys()) {
@@ -88,7 +90,7 @@ class AdminService extends Service {
     }
     obj.updateTime = Math.round(new Date() / 1000);
     await this.ctx.model.Admin.updateOne({ name: admin.name }, obj);
-    return [ 0, `管理员${admin.name}信息修改成功` ];
+    return [ 0, `管理员${admin.name}信息修改成功`, results[1], results[2] ];
   }
 
   async list(page) {
@@ -108,7 +110,7 @@ class AdminService extends Service {
     } else {
       page = Number(page);
     }
-    return [ 0, '所有管理员信息返回成功', adminResult, totals, page ];
+    return [ 0, '所有管理员信息返回成功', adminResult, totals, page, results[1], results[2] ];
   }
   // 删除管理员
   async delete(params) {
@@ -120,7 +122,7 @@ class AdminService extends Service {
     const check = await ctx.model.Admin.findOne({ id: params.id }).ne('deleted', 0);
     if (!check) { return [ -1, `该管理员${check.name}不存在或已经被软删除了` ]; }
     await this.ctx.model.Admin.updateOne({ id: check.id }, { deleted: 0 });
-    return [ 0, `该管理员${check.name}不存在或已经被软删除了` ];
+    return [ 0, `该管理员${check.name}已经被软删除了`, results[1], results[2] ];
   }
 
   // 管理员dashboard
