@@ -8,7 +8,6 @@
 const Service = require('egg').Service;
 const md5 = require('js-md5');
 const jwt = require('../utils/jwt');
-const { ERROR, SUCCESS } = require('../utils/restful');
 const path = require('path');
 const sd = require('silly-datetime');
 const mkdirp = require('mkdirp');
@@ -134,6 +133,10 @@ class UserService extends Service {
     return [ 0, `用户${user.nickName}状态恢复正常，请告诉${user.nickName}`, results[1], results[2] ];
   }
   // 上传头像
+  /**
+   * 获取文件上传目录
+   * @param {*} filename
+   */
   async saveAvatar(filename) {
     const { ctx, app } = this;
     const results = jwt(app, ctx.request.header.authorization);

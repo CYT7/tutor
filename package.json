@@ -16,6 +16,7 @@
     "egg-validate": "^2.0.2",
     "js-md5": "^0.7.3",
     "mysql2": "^2.2.5",
+    "pump": "^3.0.0",
     "silly-datetime": "^0.1.2"
   },
   "devDependencies": {
