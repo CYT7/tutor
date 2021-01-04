@@ -72,7 +72,7 @@ class AdminService extends Service {
       params.password = md5(params.newPassword);
       if (oldPwd === params.password) { return [ 404007, '新密码不能和旧密码一模一样，请重新输入' ]; }
     }
-    const checkParams = [ 'realname', 'password' ];
+    const checkParams = [ 'password', 'realName' ];
     const newData = new Map();
     const paramMap = new Map(Object.entries(params));
     const newAdmin = new Map(Object.entries(admin.toObject()));
