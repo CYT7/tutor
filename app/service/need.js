@@ -96,9 +96,9 @@ class NeedService extends Service {
     if (!user) { return [ -2, '用户不存在' ]; }
     const need = await ctx.model.Need.findOne({ id: params.id, state: 3 });
     if (!need) { return [ 400603, '查无此需求' ]; }
-    const teacher = await ctx.model.Teacher.findOne({ id: params.teacherId }).ne('status', 0);
-    if (!teacher) { return [ 400603, '查无此老师' ]; }
-    await this.ctx.model.Need.updateOne({ id: need.id }, { state: 4, total_appoint: params.teacherId });
+    const Teacher = await ctx.model.Teacher.findOne({ id: params.teacherId }).ne('status', 0);
+    if (!Teacher) { return [ 400603, '查无此老师' ]; }
+    await this.ctx.model.Need.updateOne({ id: need.id }, { state: 4, teacher:Teacher });
     return [ 0, '此需求已经选定老师', results[1], results[2] ];
   }
 
@@ -110,6 +110,10 @@ class NeedService extends Service {
     const user = await ctx.model.User.findOne({ id: results[3] }).ne('status', 0);
     if (!user) { return [ -2, '用户不存在' ]; }
     const need = await ctx.model.Need.findOne({ id: params.id, state: 4 });
+    const appointPrice = need.totalPrice;
+    if (user.balance < appointPrice) { return [ 400604, '余额不足，需求无法完成，请充值' ]; }
+    user.balance -= appointPrice;
+    user.save();
     if (!need) { return [ 400604, '查无此需求' ]; }
     await this.ctx.model.Need.updateOne({ id: need.id }, { state: 5 });
     return [ 0, `${need.id} 需求已经完成`, results[1], results[2] ];

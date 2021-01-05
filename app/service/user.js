@@ -140,5 +140,19 @@ class UserService extends Service {
     await this.ctx.model.User.updateOne({ id: results[3] }, { image_url: saveDir });
     return { uploadDir, saveDir };
   }
+  // 增加余额
+  async balanceAdd(param) {
+    const { ctx, app } = this;
+    const results = jwt(app, ctx.request.header.authorization);
+    if (results[0]) { return [ -1, '请求失败' ]; }
+    const user = await ctx.model.User.findOne({ id: results[3] }).ne('status', 0);
+    if (!user) { return [ -2, '用户不存在' ]; }
+    if (param.balance) {
+      user.balance += param.balance;
+      user.save();
+      return [ 0, `余额：+${param.balance / 100}元` ];
+    }
+    return [ -1, '增加失败，请增加固定金额' ];
+  }
 }
 module.exports = UserService;
