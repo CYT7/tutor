@@ -43,16 +43,15 @@ module.exports = app => {
    * 预约相关接口
    **/
   const appointApi = '/business/appoint';
-  router.post(`${appointApi}/see`, controller.business.appoint.see);
+  router.post(`${appointApi}/create`, controller.business.appoint.create);
+  router.post(`${appointApi}/agree`, controller.business.appoint.agree);
+  router.post(`${appointApi}/disagree`, controller.business.appoint.disagree);
+  router.post(`${appointApi}/pay`, controller.business.appoint.pay);
+  router.post(`${appointApi}/teacherSee`, controller.business.appoint.teacherSee);
+  router.post(`${appointApi}/userSee`, controller.business.appoint.userSee);
   router.post(`${appointApi}/finish`, controller.business.appoint.finish);
   router.post(`${appointApi}/close`, controller.business.appoint.close);
-  router.get(`${appointApi}/list`, controller.business.appoint.list);
+  router.get(`${appointApi}/userList`, controller.business.appoint.userList);
+  router.get(`${appointApi}/teacherList`, controller.business.appoint.userList);
 
-  /**
-   * 评论相关接口
-   **/
-  const commentApi = '/business/comment';
-  router.post(`${commentApi}/generate`, controller.business.comment.generate);
-  router.post(`${commentApi}/see`, controller.business.comment.see);
-  router.get(`${commentApi}/list`, controller.business.comment.list);
 };

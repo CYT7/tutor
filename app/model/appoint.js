@@ -10,16 +10,9 @@ module.exports = app => {
 
   const AppointSchema = new Schema({
     id: { type: String },
-    need: { type: Schema.Types.ObjectId, ref: 'Need' }, // 需求id
     student: { type: Schema.Types.ObjectId, ref: 'User' }, // 家长id
     teacher: { type: Schema.Types.ObjectId, ref: 'Teacher' }, // 老师id
-    tradeNo: { type: Number, default: 0 }, // 订单号
-    studentComment: { type: Number, default: 0 }, // 学生是否已评论 0未评论 1已评论
-    teacherComment: { type: Number, default: 0 }, // 老师是否已评论 0未评论 1已评论
-    studentDelete: { type: Number, default: 0 }, // 学生是否已软删除 0未删除 1已删除
-    teacherDelete: { type: Number, default: 0 }, // 老师是否已软删除 0未删除 1已删除
-    state: { type: Number, default: 0 }, // 状态 1已预约 2待付款 已中标 3进行中 4待结课 5待关闭 6待评论 7已完成 8已关闭
-    reason: { type: String, default: null }, // 关闭原因
+    state: { type: Number, default: 0 }, // 状态 0未预约 1已预约 待付款 2进行中 3已完成 4已关闭
     status: { type: Number, default: 1 }, // 状态 0禁用 1启用
     frequency: { type: Number, default: 0 }, // 总共几次
     timeHour: { type: Number, default: 0 }, // 每次几小时

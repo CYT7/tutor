@@ -18,8 +18,6 @@ module.exports = app => {
     qq: { type: String, default: null }, // QQ 教员中标后才展示,详情页面不展示(可选)
     gender: { type: Number, default: 0 }, // 性别 1男2女，详情页展示(必选)
     teacherGender: { type: Number, default: 0 }, // 教师性别要求 0不限1男2女 搜索条件(必选)
-    studentComment: { type: Number, default: 0 }, // 学生是否已评论 0未评论 1已评论
-    teacherComment: { type: Number, default: 0 }, // 老师是否已评论 0未评论 1已评论
     address: { type: String, default: null }, // 地址
     teach_date: { type: String, default: null }, // 上课时间
     subject: { type: String, default: null }, // 科目

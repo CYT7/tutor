@@ -43,7 +43,6 @@ module.exports = app => {
    */
   const userApi = '/admin/user';
   router.get(`${userApi}/list`, controller.admin.user.list);
-  router.post(`${userApi}/recovery`, controller.admin.user.recovery);
 
   /**
    * 需求相关接口
@@ -58,6 +57,4 @@ module.exports = app => {
    */
   const appointApi = '/admin/appoint';
   router.get(`${appointApi}/list`, controller.admin.appoint.list);
-
-
 };
