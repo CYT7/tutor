@@ -92,7 +92,7 @@ class UserService extends Service {
     const results = jwt(app, ctx.request.header.authorization);
     if (results[0]) { return [ -1, '请求失败' ]; }
     const user = await ctx.model.User.findOne({ id: results[3] }).ne('status', 0);
-    if (!user) { return [ -2, '请求失败' ]; }
+    if (!user) { return [ -2, '不存在用户' ]; }
     if (params.oldPassword) {
       const oldPwd = md5(params.oldPassword);
       if (oldPwd !== user.password) { return [ 400403, '旧密码输入错误，请重新输入' ]; }
@@ -119,18 +119,6 @@ class UserService extends Service {
     await this.ctx.model.User.updateOne({ id: results[3] }, obj);
     ctx.status = 201;
     return [ 0, '用户个人信息修改成功', results[1], results[2] ];
-  }
-  // 恢复用户状态
-  async recovery(params) {
-    const { ctx, app } = this;
-    const results = jwt(app, ctx.request.header.authorization);
-    if (results[0]) { return [ -3, '请求失败' ]; }
-    const admin = await ctx.model.Admin.findOne({ name: results[3] });
-    if (!admin) { return [ -1, `不存在管理员${results[3]}` ]; }
-    const user = await ctx.model.User.findOne({ id: params.id, status: 0 });
-    if (!user) { return [ 404402, '不存在该用户' ]; }
-    await this.ctx.model.User.updateOne({ id: params.id }, { status: 1 });
-    return [ 0, `用户${user.nickName}状态恢复正常，请告诉${user.nickName}`, results[1], results[2] ];
   }
   // 上传头像
   /**

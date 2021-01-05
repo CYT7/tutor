@@ -18,15 +18,5 @@ class UserController extends Controller {
       ctx.body = { code: res[0], msg: res[1] };
     }
   }
-  // 恢复用户状态
-  async recovery() {
-    const { ctx } = this;
-    const res = await ctx.service.user.recovery(ctx.request.body);
-    if (res) {
-      ctx.body = { code: res[0], msg: res[1], token: res[2], exp: res[3] };
-    } else {
-      ctx.body = { code: res[0], msg: res[1] };
-    }
-  }
 }
 module.exports = UserController;
