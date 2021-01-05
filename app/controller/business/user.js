@@ -13,8 +13,8 @@ class UserController extends Controller {
   async create() {
     const { ctx } = this;
     const res = await ctx.service.user.create(ctx.request.body);
-    ctx.status = 201;
     if (res) {
+      ctx.status = 201;
       ctx.body = { code: res[0], msg: res[1] };
     } else {
       ctx.body = { code: res[0], msg: res[1] };
@@ -25,6 +25,7 @@ class UserController extends Controller {
     const { ctx } = this;
     const res = await ctx.service.user.login(ctx.request.body);
     if (res) {
+      ctx.status = 201;
       ctx.body = { code: res[0], msg: res[1], token: res[2], exp: res[3] };
     } else {
       ctx.body = { code: res[0], msg: res[1] };

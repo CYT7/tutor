@@ -8,42 +8,90 @@ class NeedController extends Controller {
   // 创建需求
   async create() {
     const { ctx } = this;
-    ctx.body = await ctx.service.need.create(ctx.request.body);
+    const res = await ctx.service.need.create(ctx.request.body);
+    if (res) {
+      ctx.status = 201;
+      ctx.body = { code: res[0], msg: res[1], token: res[2], exp: res[3] };
+    } else {
+      ctx.body = { code: res[0], msg: res[1] };
+    }
   }
   // 申请需求(老师申请执教）
   async apply() {
     const { ctx } = this;
-    ctx.body = await ctx.service.need.apply(ctx.request.body);
+    const res = await ctx.service.need.apply(ctx.request.body);
+    if (res) {
+      ctx.status = 201;
+      ctx.body = { code: res[0], msg: res[1], token: res[2], exp: res[3] };
+    } else {
+      ctx.body = { code: res[0], msg: res[1] };
+    }
   }
   // 修改需求（审核不通过）
   async modify() {
     const { ctx } = this;
-    ctx.body = await ctx.service.need.modify(ctx.request.body);
+    const res = await ctx.service.need.modify(ctx.request.body);
+    if (res) {
+      ctx.status = 201;
+      ctx.body = { code: res[0], msg: res[1], token: res[2], exp: res[3] };
+    } else {
+      ctx.body = { code: res[0], msg: res[1] };
+    }
   }
   // 关闭需求
   async close() {
     const { ctx } = this;
-    ctx.body = await ctx.service.need.close(ctx.request.body);
+    const res = await ctx.service.need.close(ctx.request.body);
+    if (res) {
+      ctx.status = 201;
+      ctx.body = { code: res[0], msg: res[1], token: res[2], exp: res[3] };
+    } else {
+      ctx.body = { code: res[0], msg: res[1] };
+    }
   }
   // 确定需求
   async confirm() {
     const { ctx } = this;
-    ctx.body = await ctx.service.need.confirm(ctx.request.body);
+    const res = await ctx.service.need.confirm(ctx.request.body);
+    if (res) {
+      ctx.status = 201;
+      ctx.body = { code: res[0], msg: res[1], token: res[2], exp: res[3] };
+    } else {
+      ctx.body = { code: res[0], msg: res[1] };
+    }
   }
   // 需求完成
   async finish() {
     const { ctx } = this;
-    ctx.body = await ctx.service.need.finish(ctx.request.body);
+    const res = await ctx.service.need.finish(ctx.request.body);
+    if (res) {
+      ctx.status = 201;
+      ctx.body = { code: res[0], msg: res[1], token: res[2], exp: res[3] };
+    } else {
+      ctx.body = { code: res[0], msg: res[1] };
+    }
   }
   // 单一需求信息
   async information() {
     const { ctx } = this;
-    ctx.body = await ctx.service.need.information(ctx.request.body);
+    const res = await ctx.service.need.information(ctx.request.body);
+    if (res) {
+      ctx.status = 201;
+      ctx.body = { code: res[0], msg: res[1], data: res[2], token: res[3], exp: res[4] };
+    } else {
+      ctx.body = { code: res[0], msg: res[1] };
+    }
   }
   // 所有需求信息
   async list() {
     const { ctx } = this;
-    ctx.body = await ctx.service.need.list(ctx.request.query.page);
+    const res = await ctx.service.need.list(ctx.request.query.page);
+    if (res) {
+      ctx.status = 201;
+      ctx.body = { code: res[0], msg: res[1], data: res[2],totals: res[3], page:res[4], token: res[5], exp: res[6] };
+    } else {
+      ctx.body = { code: res[0], msg: res[1] };
+    }
   }
 }
 module.exports = NeedController;

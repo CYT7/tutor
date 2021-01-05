@@ -8,17 +8,35 @@ class NeedController extends Controller {
   // 审核需求-通过
   async agree() {
     const { ctx } = this;
-    ctx.body = await ctx.service.need.agree(ctx.request.body);
+    const res = await ctx.service.need.agree(ctx.request.body);
+    if (res) {
+      ctx.status = 201;
+      ctx.body = { code: res[0], msg: res[1], token: res[2], exp: res[3] };
+    } else {
+      ctx.body = { code: res[0], msg: res[1] };
+    }
   }
   // 审核需求-不同意
   async disagree() {
     const { ctx } = this;
-    ctx.body = await ctx.service.need.disagree(ctx.request.body);
+    const res = await ctx.service.need.disagree(ctx.request.body);
+    if (res) {
+      ctx.status = 201;
+      ctx.body = { code: res[0], msg: res[1], token: res[2], exp: res[3] };
+    } else {
+      ctx.body = { code: res[0], msg: res[1] };
+    }
   }
   // 所有需求信息
   async list() {
     const { ctx } = this;
-    ctx.body = await ctx.service.need.adminList(ctx.request.query.page);
+    const res = await ctx.service.need.adminList(ctx.request.query.page);
+    if (res) {
+      ctx.status = 201;
+      ctx.body = { code: res[0], msg: res[1], data: res[2],totals: res[3], page:res[4], token: res[5], exp: res[6] };
+    } else {
+      ctx.body = { code: res[0], msg: res[1] };
+    }
   }
 }
 module.exports = NeedController;
