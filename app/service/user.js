@@ -54,6 +54,8 @@ class UserService extends Service {
       iat: Math.round(new Date() / 1000),
       exp,
     }, app.config.jwt.secret);
+    user.loginTime = Math.round(new Date() / 1000);
+    user.save();
     return [ 0, `${user.nickName} 登录成功，欢迎回来`, token, exp ];
   }
   // 用户个人信息

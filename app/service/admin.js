@@ -66,7 +66,7 @@ class AdminService extends Service {
     if (results[0]) { return [ -3, '请求失败' ]; }
     const admin = await ctx.model.Admin.findOne({ name: results[3] });
     if (!admin) { return [ -1, `不存在管理员${results[3]}` ]; }
-    if (params.oldPassword && params.newPassword) {
+    if ((params.oldPassword !== '') && (params.newPassword !== '')) {
       const oldPwd = md5(params.oldPassword);
       if (oldPwd !== admin.password) { return [ 404007, '旧密码输入错误，请重新输入' ]; }
       params.password = md5(params.newPassword);
@@ -91,6 +91,37 @@ class AdminService extends Service {
     obj.updateTime = Math.round(new Date() / 1000);
     await this.ctx.model.Admin.updateOne({ name: admin.name }, obj);
     return [ 0, `管理员${admin.name}信息修改成功`, results[1], results[2] ];
+  }
+  // 修改某个管理员的个人信息
+  async modifyAdmin(params) {
+    const { ctx, app } = this;
+    const results = jwt(app, ctx.request.header.authorization);
+    if (results[0]) { return [ -3, '请求失败' ]; }
+    const admin = await ctx.model.Admin.findOne({ name: results[3] });
+    if (!admin) { return [ -1, `不存在管理员${results[3]}` ]; }
+    const updateAdmin = await ctx.model.Admin.findOne({ id: params.id, deleted: 1 });
+    if (!updateAdmin) { return [ -1, '账号不存在' ]; }
+    if (params.password && params.password < 6) { return [ -6, '密码长度不能少于6位' ]; }
+    if (params.password) { params.password = md5(params.password); }
+    const checkParams = [ 'password', 'realName' ];
+    const newData = new Map();
+    const paramMap = new Map(Object.entries(params));
+    const newAdmin = new Map(Object.entries(admin.toObject()));
+    for (const k of paramMap.keys()) {
+      if (params[k] !== newAdmin.get(k)) {
+        if (!checkParams.includes(k)) { continue; }
+        if (!params[k]) { continue; }
+        newData.set(k, params[k]);
+      }
+    }
+    if (!newData.size) { return [ 404007, '没有进行任何修改' ]; }
+    const obj = Object.create(null);
+    for (const [ k, v ] of newData) {
+      obj[k] = v;
+    }
+    obj.updateTime = Math.round(new Date() / 1000);
+    await this.ctx.model.Admin.updateOne({ id: params.id }, obj);
+    return [ 0, `管理员${updateAdmin.name}信息修改成功`, results[1], results[2] ];
   }
 
   async list(page) {

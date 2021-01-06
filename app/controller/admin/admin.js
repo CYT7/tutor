@@ -85,6 +85,17 @@ class AdminController extends Controller {
     }
     ctx.status = 201;
   }
+  // 修改某个管理员的个人信息
+  async modifyAdmin() {
+    const { ctx } = this;
+    const res = await ctx.service.admin.modifyAdmin(ctx.request.body);
+    if (res) {
+      ctx.body = { code: res[0], msg: res[1], data: res[2], token: res[3], exp: res[4] };
+    } else {
+      ctx.body = { code: res[0], msg: res[1] };
+    }
+    ctx.status = 201;
+  }
 }
 
 module.exports = AdminController;

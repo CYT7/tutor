@@ -17,6 +17,7 @@ class CategoryService extends Service {
     const admin = await ctx.model.Admin.findOne({ name: results[3] });
     if (!admin) { return [ -1, `不存在管理员${results[3]}` ]; }
     const category = await ctx.model.Category.aggregate().sort({ id: -1 });
+    if (!params.name) { return [ -2, '参数异常' ]; }
     const newCategory = new ctx.model.Category({
       createTime: Math.round(new Date() / 1000),
       parentId: params.parentId,

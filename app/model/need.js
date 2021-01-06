@@ -12,7 +12,6 @@ module.exports = app => {
     id: { type: String },
     User: { type: Schema.Types.ObjectId, ref: 'User' }, // 用户
     teacher: { type: Schema.Types.ObjectId, ref: 'Teacher' }, // 老师id
-    tradeNo: { type: String, default: null }, // 订单号
     nickName: { type: String, default: null }, // 称呼，如陈同学，详情页展示(必选)
     phone: { type: String, default: null }, // 联系电话，家教中标才展示,详情页面不展示(必选)
     wechat: { type: String, default: null }, // 微信号，教员中标后才展示,详情页面不展示(可选)
@@ -28,7 +27,6 @@ module.exports = app => {
     hourPrice: { type: Number, default: 0 }, // 每小时几元(必选)
     totalPrice: { type: Number, default: 0 }, // 总报价(必选)
     state: { type: Number, default: 1 }, // 审核状态 1审核中,2审核不通过，3审核通过，4已选定，5已完成，6已关闭。
-    reason: { type: String, default: null }, // 关闭原因
     sort: { type: Number, default: 0 }, // 排序
     deleted: { type: Number, default: 0 }, // 家长是否已软删除 0否 1是
     status: { type: Number, default: 1 }, // 状态 0禁用 1正常

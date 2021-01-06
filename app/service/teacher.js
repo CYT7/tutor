@@ -7,7 +7,6 @@
 
 const Service = require('egg').Service;
 const jwt = require('../utils/jwt');
-const { ERROR, SUCCESS } = require('../utils/restful');
 
 class TeacherService extends Service {
   // 创建老师

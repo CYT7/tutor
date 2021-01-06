@@ -12,7 +12,6 @@ module.exports = app => {
     id: { type: String, allowNull: false },
     User: { type: Schema.Types.ObjectId, ref: 'User' }, // 用户
     totalSuccess: { type: Number, default: 0 }, // 成功次数
-    totalComment: { type: Number, default: 0 }, // 评论次数
     experience: { type: Number, default: 0 }, // 教学经验(年)
     age: { type: Number, default: 0 }, // 年龄
     goodAt: { type: Array, default: null }, // 擅长科目
