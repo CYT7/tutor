@@ -18,11 +18,15 @@ class CategoryService extends Service {
     if (!admin) { return [ -1, `不存在管理员${results[3]}` ]; }
     const category = await ctx.model.Category.aggregate().sort({ id: -1 });
     if (!params.name) { return [ -2, '参数异常' ]; }
-    const newCategory = new ctx.model.Category({
-      createTime: Math.round(new Date() / 1000),
-      parentId: params.parentId,
-      name: params.name,
-    });
+    const newCategory = new ctx.model.Category({ createTime: Math.round(new Date() / 1000) });
+    if (params.parentId) {
+      const checkId = await ctx.model.Category.findOne({ id: params.parentId }).ne('deleted', 0);
+      if (!checkId) { return [ -2, '参数异常' ]; }
+      newCategory.parentId = params.parentId;
+      newCategory.name = checkId.name + params.name;
+    } else {
+      newCategory.name = params.name;
+    }
     if (!category.length) {
       newCategory.id = 1;
       newCategory.save();

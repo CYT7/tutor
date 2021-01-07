@@ -98,7 +98,7 @@ class NeedService extends Service {
     if (!need) { return [ 400603, '查无此需求' ]; }
     const Teacher = await ctx.model.Teacher.findOne({ id: params.teacherId }).ne('status', 0);
     if (!Teacher) { return [ 400603, '查无此老师' ]; }
-    await this.ctx.model.Need.updateOne({ id: need.id }, { state: 4, teacher:Teacher });
+    await this.ctx.model.Need.updateOne({ id: need.id }, { state: 4, teacher: Teacher });
     return [ 0, '此需求已经选定老师', results[1], results[2] ];
   }
 
@@ -183,18 +183,42 @@ class NeedService extends Service {
     return [ 0, '所有需求信息返回成功', NeedResult, totals, page, results[1], results[2] ];
   }
   // 所有需求信息
-  async adminList(page) {
+  async adminList(page, types) {
     const { ctx, app } = this;
     const results = jwt(app, ctx.request.header.authorization);
     if (results[0]) { return [ -3, '请求失败' ]; }
     const { pageSize } = this.config.paginatorConfig;
-    const total = await this.ctx.model.Need.find({}).ne('status', 0).count();
-    if (!total) { return [ 404503, '暂无需求信息' ]; }
+    const typesResults = [];
+    if (types) {
+      types.forEach((data, index, array) => {
+        console.log(data);
+        typesResults.push(+data);
+      });
+      typesResults.sort();
+
+    }
+    let total = null;
+    if (types) {
+      total = await this.ctx.model.Need.find({ state: { $in: typesResults } }).count();
+      if (!total) { return [ 404503, '暂无需求信息' ]; }
+    } else {
+      total = await this.ctx.model.Need.find({}).count();
+      if (!total) { return [ 404503, '暂无需求信息' ]; }
+    }
     const totals = Math.ceil(total / pageSize);
     if (page > totals) { return [ -2, '无效页码' ]; }
     if (page < 1) { page = 1; }
-    const NeedResult = await this.ctx.model.Need.find({}).ne('status', 0).skip((page - 1) * pageSize)
-      .limit(pageSize);
+    let NeedResult = null;
+    if (types) {
+      NeedResult = await this.ctx.model.Need.find({ state: { $in: typesResults } }).ne('status', 0).skip((page - 1) * pageSize)
+        .limit(pageSize)
+        .populate('User', 'nickName')
+        .exec();
+    } else {
+      NeedResult = await this.ctx.model.Need.find({}).ne('status', 0).skip((page - 1) * pageSize)
+        .limit(pageSize)
+        .exec();
+    }
     if (!Number(page)) {
       page = 1;
     } else {
