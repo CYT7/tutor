@@ -16,6 +16,7 @@ module.exports = app => {
     status: { type: Number, default: 1 }, // 状态 0禁用 1启用
     frequency: { type: Number, default: 0 }, // 总共几次
     timeHour: { type: Number, default: 0 }, // 每次几小时
+    teach_date: { type: String, default: null }, // 上课时间
     hourPrice: { type: Number, default: 0 }, // 每小时几元
     totalPrice: { type: Number, default: 0 }, // 老师报价
     name: { type: String, default: null }, // 学生称呼

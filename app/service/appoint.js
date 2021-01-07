@@ -23,7 +23,8 @@ class AppointService extends Service {
       teacher: Teacher,
       frequency: params.frequency,
       timeHour: params.timeHour,
-      hourPrice: params.hourPrice,
+      teach_date: params.teach_date,
+      hourPrice: Teacher.hourPrice,
       name: params.name,
       phone: params.phone,
       wechat: params.wechat,
@@ -176,7 +177,7 @@ class AppointService extends Service {
     } else {
       page = Number(page);
     }
-    return [ 0, '所有用户信息返回成功', appointResult, totals, page, results[1], results[2] ];
+    return [ 0, '所有预约信息返回成功', appointResult, totals, page, results[1], results[2] ];
   }
   // 管理员查看所有预约
   async adminList(page) {
