@@ -50,7 +50,7 @@ module.exports = appInfo => {
     },
   };
   config.paginatorConfig = {
-    pageSize: 1,
+    pageSize: 10,
   };
   config.uploadDir = 'app/public/static/upload';
   config.jwt = {
