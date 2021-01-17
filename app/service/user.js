@@ -44,7 +44,7 @@ class UserService extends Service {
   // 用户登录
   async login(params) {
     const { ctx, app } = this;
-    const user = await ctx.model.User.findOne({ $or: [{ phone: params.phone }, { email: params.email }] }).ne('status', 0);
+    const user = await ctx.model.User.findOne({ $or: [{ phone: params.username }, { email: params.username }] }).ne('status', 0);
     if (!user) { return [ 400401, '亲，你尚未创建账号或者账号被禁用(请联系管理员)了哦' ]; }
     const pwd = md5(params.password);
     if (pwd !== user.password) { return [ 404401, '登录失败，密码错误' ]; }
