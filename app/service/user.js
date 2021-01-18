@@ -24,6 +24,8 @@ class UserService extends Service {
       phone: params.phone,
       email: params.email,
       password: md5(params.password),
+      gender: params.gender,
+      address: params.address,
     });
     newUser.nickName = params.nickName;
     if (!params.nickName) {

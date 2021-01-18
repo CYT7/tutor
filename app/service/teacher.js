@@ -102,6 +102,26 @@ class TeacherService extends Service {
     return [ 0, `${teacher.User.nickName}审核不通过`, results[1], results[2] ];
   }
   // 所有教师信息列表
+  async ListOfUser(page) {
+    const { ctx, app } = this;
+    const results = jwt(app, ctx.request.header.authorization);
+    if (results[0]) { return [ -3, '请求失败' ]; }
+    const { pageSize } = this.config.paginatorConfig;
+    const total = await this.ctx.model.Teacher.find({}).count();
+    if (!total) { return [ 404404, '暂无教师信息' ]; }
+    const totals = Math.ceil(total / pageSize);
+    if (page > totals) { return [ -2, '无效页码' ]; }
+    if (page < 1) { page = 1; }
+    const result = await this.ctx.model.Teacher.find({}).populate({ path: 'User', select: { _id: 0, password: 0, id: 0 } }).skip((page - 1) * pageSize)
+      .limit(pageSize);
+    if (!Number(page)) {
+      page = 1;
+    } else {
+      page = Number(page);
+    }
+    return [ 0, '所有教师信息返回成功', result, totals, page, results[1], results[2] ];
+  }
+  // 所有教师信息列表
   async list(page) {
     const { ctx, app } = this;
     const results = jwt(app, ctx.request.header.authorization);

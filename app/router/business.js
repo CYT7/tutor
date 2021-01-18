@@ -25,6 +25,7 @@ module.exports = app => {
   router.post(`${teacherApi}/create`, controller.business.teacher.create);
   router.post(`${teacherApi}/information`, controller.business.teacher.information);
   router.put(`${teacherApi}/information`, controller.business.teacher.modify);
+  router.get(`${teacherApi}/list`, controller.business.teacher.list);
 
   /**
    * 需求相关接口

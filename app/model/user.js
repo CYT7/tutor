@@ -17,7 +17,7 @@ module.exports = app => {
     password: String, // 密码
     qq: { type: String, default: null }, // QQ
     wechat: { type: String, default: null }, // 微信号
-    address: { type: String, default: null }, // 地址
+    address: { type: Array, default: null }, // 地址
     balance: { type: Number, default: 0.00 }, // 余额
     gender: { type: Number, default: 0 }, // 性别 0 未知，1男 2女
     status: { type: Number, default: 1 }, // 状态 1 正常 0 禁用
