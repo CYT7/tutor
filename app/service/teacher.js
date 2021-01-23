@@ -23,6 +23,8 @@ class TeacherService extends Service {
       age: params.age,
       hourPrice: params.hourPrice,
       goodAt: params.goodAt,
+      city: params.city,
+      school: params.school,
       createTime: Math.round(new Date() / 1000),
     });
     if (!teacher.length) {
