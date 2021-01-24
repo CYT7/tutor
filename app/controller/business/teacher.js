@@ -40,6 +40,17 @@ class TeacherController extends Controller {
       ctx.body = { code: res[0], msg: res[1] };
     }
   }
+  // 用户查看教师个人信息
+  async informationofUser() {
+    const { ctx } = this;
+    const res = await ctx.service.teacher.informationOfUser(ctx.request.body);
+    ctx.status = 201;
+    if (res) {
+      ctx.body = { code: res[0], msg: res[1], data: res[2], token: res[3], exp: res[4] };
+    } else {
+      ctx.body = { code: res[0], msg: res[1] };
+    }
+  }
   // 所有教师信息列表
   async list() {
     const { ctx } = this;

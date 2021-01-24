@@ -103,6 +103,17 @@ class TeacherService extends Service {
     await this.ctx.model.Teacher.updateOne({ id: teacher.id }, { state: 2 });
     return [ 0, `${teacher.User.nickName}审核不通过`, results[1], results[2] ];
   }
+  // 用户查看教师个人信息
+  async informationOfUser(params) {
+    const { ctx, app } = this;
+    const results = jwt(app, ctx.request.header.authorization);
+    if (results[0]) { return [ -1, '请求失败' ]; }
+    const user = await ctx.model.User.findOne({ id: results[3] }).ne('status', 0);
+    if (!user) { return [ -2, '不存在用户' ]; }
+    const teacherResult = await ctx.model.Teacher.findOne({ id: params.id }).populate({ path: 'User', select: { _id: 0, password: 0, id: 0 } });
+    if (!teacherResult) { return [ 400502, '尚无此老师信息' ]; }
+    return [ 0, `${teacherResult.User.nickName}个人信息返回成功`, teacherResult, results[1], results[2] ];
+  }
   // 所有教师信息列表
   async ListOfUser(page) {
     const { ctx, app } = this;
