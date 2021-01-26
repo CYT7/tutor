@@ -36,7 +36,7 @@ class UserController extends Controller {
     const { ctx } = this;
     const res = await ctx.service.user.information(ctx.request.body);
     if (res) {
-      ctx.body = { code: res[0], msg: res[1], token: res[2], exp: res[3] };
+      ctx.body = { code: res[0], msg: res[1], data: res[2], token: res[3], exp: res[4] };
     } else {
       ctx.body = { code: res[0], msg: res[1] };
     }
