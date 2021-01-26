@@ -1,11 +1,10 @@
 /**
  * @author: Chenyt
  * @date: 2020/12/22 1:30 PM
+* @CompletionDate：2020/01/26 4:10PM
  */
 'use strict';
-
 const Controller = require('egg').Controller;
-
 class AppointController extends Controller {
   // 生成预约
   async create() {
@@ -73,7 +72,6 @@ class AppointController extends Controller {
       ctx.body = { code: res[0], msg: res[1] };
     }
   }
-
   // 完成预约
   async finish() {
     const { ctx } = this;

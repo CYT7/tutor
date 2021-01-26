@@ -28,8 +28,8 @@ module.exports = app => {
   const categoryApi = '/admin/category';
   router.post(`${categoryApi}/create`, controller.admin.category.create);
   router.delete(`${categoryApi}/delete`, controller.admin.category.del);
-  router.put(`${categoryApi}/modify`, controller.admin.category.modify);
   router.get(`${categoryApi}/list`, controller.admin.category.list);
+  router.get(`${categoryApi}/List`, controller.admin.category.listOfUser);
 
   /**
    * 教师相关接口

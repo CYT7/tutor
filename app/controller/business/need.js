@@ -1,6 +1,7 @@
 /**
  * @author: Chen yt7
  * @date: 2020/12/16 2:35 PM
+ * @CompletionDate：2020/01/26 3:45PM
  */
 'use strict';
 const Controller = require('egg').Controller;
@@ -71,7 +72,7 @@ class NeedController extends Controller {
       ctx.body = { code: res[0], msg: res[1] };
     }
   }
-  // 单一需求信息
+  // 用户查看单一需求信息
   async information() {
     const { ctx } = this;
     const res = await ctx.service.need.information(ctx.request.body);
@@ -82,13 +83,46 @@ class NeedController extends Controller {
       ctx.body = { code: res[0], msg: res[1] };
     }
   }
-  // 所有需求信息
+  // 主页查看推荐需求信息
   async list() {
     const { ctx } = this;
-    const res = await ctx.service.need.list(ctx.request.query.page);
+    const res = await ctx.service.need.list(ctx.request.query);
     if (res) {
       ctx.status = 201;
-      ctx.body = { code: res[0], msg: res[1], data: res[2],totals: res[3], page:res[4], token: res[5], exp: res[6] };
+      ctx.body = { code: res[0], msg: res[1], data: res[2], total: res[3], token: res[4], exp: res[5] };
+    } else {
+      ctx.body = { code: res[0], msg: res[1] };
+    }
+  }
+  // 用户查看自已所有需求信息
+  async Userlist() {
+    const { ctx } = this;
+    const res = await ctx.service.need.Userlist(ctx.request.query.page);
+    if (res) {
+      ctx.status = 201;
+      ctx.body = { code: res[0], msg: res[1], data: res[2], totals: res[3], page: res[4], token: res[5], exp: res[6] };
+    } else {
+      ctx.body = { code: res[0], msg: res[1] };
+    }
+  }
+  // 老师查看自已所有需求信息
+  async Teacherlist() {
+    const { ctx } = this;
+    const res = await ctx.service.need.Teacherlist(ctx.request.query.page);
+    if (res) {
+      ctx.status = 201;
+      ctx.body = { code: res[0], msg: res[1], data: res[2], totals: res[3], page: res[4], token: res[5], exp: res[6] };
+    } else {
+      ctx.body = { code: res[0], msg: res[1] };
+    }
+  }
+  // 用户查看所有需求信息
+  async List() {
+    const { ctx } = this;
+    const res = await ctx.service.need.List(ctx.request.query.page);
+    if (res) {
+      ctx.status = 201;
+      ctx.body = { code: res[0], msg: res[1], data: res[2], totals: res[3], page: res[4], token: res[5], exp: res[6] };
     } else {
       ctx.body = { code: res[0], msg: res[1] };
     }

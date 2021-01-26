@@ -1,11 +1,10 @@
 /**
  * @author: Chen yt7
  * @date: 2020/12/15 1:25 PM
+ * @CompletionDate：2020/01/26 4:00PM
  */
 'use strict';
-
 const Controller = require('egg').Controller;
-
 class TeacherController extends Controller {
   // 创建teacher
   async create() {
@@ -62,5 +61,17 @@ class TeacherController extends Controller {
       ctx.body = { code: res[0], msg: res[1] };
     }
   }
+  // 首页教师信息列表
+  async listOfRecommend() {
+    const { ctx } = this;
+    const res = await ctx.service.teacher.listOfRecommend(ctx.request.query);
+    if (res) {
+      ctx.status = 201;
+      ctx.body = { code: res[0], msg: res[1], data: res[2], total: res[3], token: res[4], exp: res[5] };
+    } else {
+      ctx.body = { code: res[0], msg: res[1] };
+    }
+  }
+
 }
 module.exports = TeacherController;

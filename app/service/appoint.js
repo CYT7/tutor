@@ -1,12 +1,11 @@
 /**
  * @author: Chen yt7
  * @date: 2020/12/22 1:45 PM
+ * @CompletionDate：2020/01/26 4:10PM
  */
 'use strict';
-
 const Service = require('egg').Service;
 const jwt = require('../utils/jwt');
-
 class AppointService extends Service {
   // 生成预约
   async create(params) {

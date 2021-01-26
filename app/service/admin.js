@@ -1,14 +1,12 @@
 /**
  * @author: Chen yt7
  * @date: 2020/12/12 2:30 PM
- * @modifyDate：2020/01/03 9：00PM
+ * @CompletionDate：2020/01/26 1:50PM
  */
 'use strict';
-
 const Service = require('egg').Service;
 const md5 = require('js-md5');
 const jwt = require('../utils/jwt');
-
 class AdminService extends Service {
   // 创建管理员
   async create(params) {
@@ -19,7 +17,7 @@ class AdminService extends Service {
     const check = await ctx.model.Admin.findOne({ id: admin[0].id + 1 });
     if (check) { return [ 404002, '操作频繁,请稍后再试' ]; }
     const checkName = await ctx.model.Admin.findOne({ name: params.name }).ne('deleted', 0);
-    if (checkName) { return [ -1, '管理员名已经存在' ]; }
+    if (checkName) { return [ 404002, '管理员名已经存在' ]; }
     const newAdmin = await ctx.model.Admin.create({
       id: admin[0].id + 1,
       name: params.name,
@@ -35,18 +33,17 @@ class AdminService extends Service {
     const { ctx, app } = this;
     if (!params.name && !params.password) { return [ -2, '参数异常' ]; }
     const checkAdmin = await ctx.model.Admin.findOne({ name: params.name, status: 1 }).ne('deleted', 0);
-    if (!checkAdmin) { return [ -1, `不存在管理员${checkAdmin.name}` ]; }
+    if (!checkAdmin) { return [ -1, `${checkAdmin.name}不存在` ]; }
     const accountPwd = checkAdmin.password;
     const checkPwd = md5(params.password);
-    if (accountPwd !== checkPwd) {
-      return [ 404001, '管理员密码错误，请重新输入' ];
-    }
+    if (accountPwd !== checkPwd) { return [ 404001, '管理员密码错误，请重新输入' ]; }
     const exp = Math.round(new Date() / 1000) + (60 * 60 * 3);
     const token = app.jwt.sign({
       name: params.name,
       iat: Math.round(new Date() / 1000),
       exp,
     }, app.config.jwt.secret);
+    await this.ctx.model.Admin.updateOne({ name: params.name }, { loginTime: Math.round(new Date() / 1000) });
     return [ 0, `${checkAdmin.name} 登录成功，欢迎回来`, token, exp ];
   }
   // 管理员个人信息
@@ -56,7 +53,7 @@ class AdminService extends Service {
     if (results[0]) { return [ -3, '请求失败' ]; }
     if (!results[3]) { return [ -2, '参数异常' ]; }
     const adminInformation = await ctx.model.Admin.findOne({ name: results[3] }, { _id: 0, password: 0 });
-    if (!adminInformation) { return [ -1, `不存在管理员${results[3]}` ]; }
+    if (!adminInformation) { return [ 404006, `不存在管理员${results[3]}` ]; }
     return [ 0, '管理员个人信息返回成功', adminInformation, results[1], results[2] ];
   }
   // 修改管理员个人信息
@@ -100,7 +97,7 @@ class AdminService extends Service {
     const admin = await ctx.model.Admin.findOne({ name: results[3] });
     if (!admin) { return [ -1, `不存在管理员${results[3]}` ]; }
     const updateAdmin = await ctx.model.Admin.findOne({ id: params.id, deleted: 1 });
-    if (!updateAdmin) { return [ -1, '账号不存在' ]; }
+    if (!updateAdmin) { return [ 404008, '账号不存在' ]; }
     if (params.password && params.password < 6) { return [ -6, '密码长度不能少于6位' ]; }
     if (params.password) { params.password = md5(params.password); }
     const checkParams = [ 'password', 'realName' ];
@@ -114,7 +111,7 @@ class AdminService extends Service {
         newData.set(k, params[k]);
       }
     }
-    if (!newData.size) { return [ 404007, '没有进行任何修改' ]; }
+    if (!newData.size) { return [ 404008, '没有进行任何修改' ]; }
     const obj = Object.create(null);
     for (const [ k, v ] of newData) {
       obj[k] = v;
@@ -134,7 +131,7 @@ class AdminService extends Service {
     const totals = Math.ceil(total / pageSize);
     if (page > totals) { return [ -2, '无效页码' ]; }
     if (page < 1) { page = 1; }
-    const adminResult = await this.ctx.model.Admin.find({}).ne('deleted', 0).skip((page - 1) * pageSize)
+    const adminResult = await this.ctx.model.Admin.find({}, { _id: 0, password: 0 }).ne('deleted', 0).skip((page - 1) * pageSize)
       .limit(pageSize);
     if (!Number(page)) {
       page = 1;
@@ -155,7 +152,6 @@ class AdminService extends Service {
     await this.ctx.model.Admin.updateOne({ id: check.id }, { deleted: 0 });
     return [ 0, `该管理员${check.name}软删除了，执行人是${results[3]}`, results[1], results[2] ];
   }
-
   // 管理员dashboard
   async dashboard() {
     const { ctx, app } = this;
@@ -176,6 +172,5 @@ class AdminService extends Service {
     resultMap.needCount = needCount;
     return [ 0, '信息返回成功', resultMap ];
   }
-
 }
 module.exports = AdminService;

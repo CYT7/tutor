@@ -1,13 +1,11 @@
 /**
  * @author: Chen yt7
  * @date: 2020/12/15 1:03 PM
- * @modifyDate：2020/12/21 12：25AM
+ * @CompletionDate：2020/01/26 4:00PM
  */
 'use strict';
-
 const Service = require('egg').Service;
 const jwt = require('../utils/jwt');
-
 class TeacherService extends Service {
   // 创建老师
   async create(params) {
@@ -153,6 +151,17 @@ class TeacherService extends Service {
       page = Number(page);
     }
     return [ 0, '所有教师信息返回成功', result, totals, page, results[1], results[2] ];
+  }
+  // 首页教师信息列表
+  async listOfRecommend() {
+    const { ctx, app } = this;
+    const results = jwt(app, ctx.request.header.authorization);
+    if (results[0]) { return [ -3, '请求失败' ]; }
+    const total = await this.ctx.model.Teacher.find({}).count();
+    if (!total) { return [ 404404, '暂无教师信息' ]; }
+    const result = await this.ctx.model.Teacher.find({}).populate({ path: 'User', select: { _id: 0, password: 0, id: 0 } }).sort({ totalSuccess: -1 })
+      .limit(10);
+    return [ 0, '所有教师信息返回成功', result, total, results[1], results[2] ];
   }
 }
 module.exports = TeacherService;

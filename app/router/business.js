@@ -27,6 +27,7 @@ module.exports = app => {
   router.put(`${teacherApi}/information`, controller.business.teacher.modify);
   router.post(`${teacherApi}/Information`, controller.business.teacher.informationofUser);
   router.get(`${teacherApi}/list`, controller.business.teacher.list);
+  router.get(`${teacherApi}/recommendList`, controller.business.teacher.listOfRecommend);
 
   /**
    * 需求相关接口
@@ -40,7 +41,9 @@ module.exports = app => {
   router.post(`${needApi}/close`, controller.business.need.close);
   router.put(`${needApi}/modify`, controller.business.need.modify);
   router.get(`${needApi}/list`, controller.business.need.list);
-
+  router.get(`${needApi}/Userlist`, controller.business.need.Userlist);
+  router.get(`${needApi}/Teacherlist`, controller.business.need.Teacherlist);
+  router.get(`${needApi}/List`, controller.business.need.List);
   /**
    * 预约相关接口
    **/
