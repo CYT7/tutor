@@ -143,7 +143,8 @@ class TeacherService extends Service {
     const totals = Math.ceil(total / pageSize);
     if (page > totals) { return [ -2, '无效页码' ]; }
     if (page < 1) { page = 1; }
-    const result = await this.ctx.model.Teacher.find({}).populate({ path: 'User', select: { _id: 0, password: 0, id: 0 } }).skip((page - 1) * pageSize)
+    const result = await this.ctx.model.Teacher.find({}).populate({ path: 'User', select: { _id: 0, password: 0, id: 0 } }).sort({ totalSuccess: -1 })
+      .skip((page - 1) * pageSize)
       .limit(pageSize);
     if (!Number(page)) {
       page = 1;

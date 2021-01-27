@@ -115,7 +115,7 @@ class AppointService extends Service {
     if (!user) { return [ -2, '不存在用户' ]; }
     const teacher = await ctx.model.Teacher.findOne({ User: user }).ne('status', 0);
     if (!teacher) { return [ -2, '你不是老师' ]; }
-    const result = await ctx.model.Appoint.findOne({ teacher, id: params.id }).ne('status', 0);
+    const result = await ctx.model.Appoint.findOne({ teacher, id: params.id }).populate({ path: 'student', select: { _id: 0, password: 0, id: 0 } }).ne('status', 0);
     if (!result) { return [ 400610, '查无此预约信息' ]; }
     return [ 0, '预约信息返回成功', result, results[1], results[2] ];
   }
@@ -128,7 +128,7 @@ class AppointService extends Service {
     if (!user) { return [ -2, '不存在用户' ]; }
     const teacher = await ctx.model.Teacher.findOne({ User: user }).ne('status', 0);
     if (!teacher) if (!user) { return [ -2, '你不是老师' ]; }
-    const result = await ctx.model.Appoint.findOne({ student: user, id: params.id }).ne('status', 0);
+    const result = await ctx.model.Appoint.findOne({ student: user, id: params.id }).populate({ path: 'teacher', select: { _id: 0 } }).ne('status', 0);
     if (!result) { return [ 400611, '查无此预约信息' ]; }
     return [ 0, '预约信息返回成功', result, results[1], results[2] ];
   }
