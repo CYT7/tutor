@@ -40,9 +40,9 @@ class CategoryController extends Controller {
     ctx.status = 201;
   }
   // 查看所有科目
-  async listOfUser() {
+  async listOfAdmin() {
     const { ctx } = this;
-    const res = await ctx.service.category.listOfUser(ctx.request.query);
+    const res = await ctx.service.category.listOfAdmin(ctx.request.query);
     if (res) {
       ctx.body = { code: res[0], msg: res[1], data: res[2], token: res[3], exp: res[4] };
     } else {

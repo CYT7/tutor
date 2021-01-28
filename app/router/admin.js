@@ -29,7 +29,7 @@ module.exports = app => {
   router.post(`${categoryApi}/create`, controller.admin.category.create);
   router.delete(`${categoryApi}/delete`, controller.admin.category.del);
   router.get(`${categoryApi}/list`, controller.admin.category.list);
-  router.get(`${categoryApi}/List`, controller.admin.category.listOfUser);
+  router.get(`${categoryApi}/List`, controller.admin.category.listOfAdmin);
 
   /**
    * 教师相关接口

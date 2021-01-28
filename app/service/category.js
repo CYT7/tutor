@@ -70,7 +70,23 @@ class CategoryService extends Service {
     }
     return [ 0, '所有科目信息返回成功', result, totals, page, results[1], results[2] ];
   }
-  // web查看所有科目
+  // Admin后台查看所有科目
+  async listOfAdmin() {
+    const { ctx, app } = this;
+    const results = jwt(app, ctx.request.header.authorization);
+    if (results[0]) { return [ -3, '请求失败' ]; }
+    const result = await this.ctx.model.Category.aggregate([{
+      $lookup: {
+        from: 'categories',
+        localField: 'id',
+        foreignField: 'parentId',
+        as: 'category_list',
+      },
+    }]);
+    if (!result) { return [ 404105, '暂无分类信息' ]; }
+    return [ 0, '所有科目信息返回成功', result, results[1], results[2] ];
+  }
+  // User查看所有科目
   async listOfUser() {
     const { ctx, app } = this;
     const results = jwt(app, ctx.request.header.authorization);

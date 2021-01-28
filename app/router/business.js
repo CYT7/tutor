@@ -59,4 +59,7 @@ module.exports = app => {
   router.get(`${appointApi}/userList`, controller.business.appoint.userList);
   router.get(`${appointApi}/teacherList`, controller.business.appoint.teacherList);
 
+  const categoryApi = '/business/category';
+  router.get(`${categoryApi}/List`, controller.business.category.listOfUser);
+
 };
