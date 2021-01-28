@@ -108,10 +108,10 @@ class AppointController extends Controller {
   // 老师查看所有预约
   async teacherList() {
     const { ctx } = this;
-    const res = await ctx.service.appoint.teacherList(ctx.request.query.page);
+    const res = await ctx.service.appoint.teacherList(ctx.request.query);
     if (res) {
       ctx.status = 201;
-      ctx.body = { code: res[0], msg: res[1], data: res[2], totals: res[3], page: res[4], token: res[5], exp: res[6] };
+      ctx.body = { code: res[0], msg: res[1], data: res[2], token: res[3], exp: res[4] };
     } else {
       ctx.body = { code: res[0], msg: res[1] };
     }

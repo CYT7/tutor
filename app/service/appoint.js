@@ -155,7 +155,7 @@ class AppointService extends Service {
     return [ 0, '所有用户信息返回成功', appointResult, totals, page, results[1], results[2] ];
   }
   // 老师查看所有预约
-  async teacherList(page) {
+  async teacherList() {
     const { ctx, app } = this;
     const results = jwt(app, ctx.request.header.authorization);
     if (results[0]) { return [ -1, '请求失败' ]; }
@@ -163,20 +163,10 @@ class AppointService extends Service {
     if (!user) { return [ -2, '不存在用户' ]; }
     const teacher = await ctx.model.Teacher.findOne({ User: user }).ne('status', 0);
     if (!teacher) { return [ -2, '你不是老师' ]; }
-    const { pageSize } = this.config.paginatorConfig;
     const total = await this.ctx.model.Appoint.find({ teacher }).ne('status', 0).count();
     if (!total) { return [ 400608, '暂无预约信息' ]; }
-    const totals = Math.ceil(total / pageSize);
-    if (page > totals) { return [ -2, '无效页码' ]; }
-    if (page < 1) { page = 1; }
-    const appointResult = await this.ctx.model.Appoint.find({ teacher }).ne('status', 0).skip((page - 1) * pageSize)
-      .limit(pageSize);
-    if (!Number(page)) {
-      page = 1;
-    } else {
-      page = Number(page);
-    }
-    return [ 0, '所有预约信息返回成功', appointResult, totals, page, results[1], results[2] ];
+    const appointResult = await this.ctx.model.Appoint.find({ teacher }).ne('status', 0)
+    return [ 0, '所有预约信息返回成功', appointResult, results[1], results[2] ];
   }
   // 管理员查看所有预约
   async adminList(page) {
