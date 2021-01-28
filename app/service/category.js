@@ -91,7 +91,7 @@ class CategoryService extends Service {
     const { ctx, app } = this;
     const results = jwt(app, ctx.request.header.authorization);
     if (results[0]) { return [ -3, '请求失败' ]; }
-    const result = await this.ctx.model.Category.find({}).ne('deleted', '0')
+    const result = await this.ctx.model.Category.find({ deleted: 1 }).ne('parentId', '0');
     if (!result) { return [ 404105, '暂无分类信息' ]; }
     return [ 0, '所有科目信息返回成功', result, results[1], results[2] ];
   }
