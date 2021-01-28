@@ -86,7 +86,7 @@ class CategoryService extends Service {
     if (!result) { return [ 404105, '暂无分类信息' ]; }
     return [ 0, '所有科目信息返回成功', result, results[1], results[2] ];
   }
-  // User查看所有科目
+  // user查看所有科目
   async listOfUser() {
     const { ctx, app } = this;
     const results = jwt(app, ctx.request.header.authorization);
