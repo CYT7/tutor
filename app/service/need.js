@@ -47,7 +47,8 @@ class NeedService extends Service {
     if (!teacher) { return [ 400601, 'sorry，你暂无执教资格，请前往申请' ]; }
     const need = await ctx.model.Need.findOne({ id: params.id, state: 3 }).ne('status', 0);
     if (!need) { return [ 400601, 'sorry,查无此需求' ]; }
-    need.total_appoint += `${teacher}`;
+    if (teacher.id === need.appoint) { return [ 400601, '你已经申请了' ]; }
+    need.appoint = teacher.id
     need.save();
     return [ 0, '该需求你申请成功，请等家长选择', results[1], results[2] ];
   }
@@ -180,6 +181,7 @@ class NeedService extends Service {
     const { pageSize } = this.config.paginatorConfig;
     const typesResults = [];
     if (types) {
+      // eslint-disable-next-line no-unused-vars
       types.forEach((data, index, array) => {
         console.log(data);
         typesResults.push(+data);
@@ -225,7 +227,7 @@ class NeedService extends Service {
     if (!user) { return [ -2, '用户不存在' ]; }
     const total = await this.ctx.model.Need.find({ User: user }).ne('status', 0).count();
     if (!total) { return [ 400607, '暂无需求信息' ]; }
-    const NeedResult = await this.ctx.model.Need.find({ User: user }).ne('status', 0)
+    const NeedResult = await this.ctx.model.Need.find({ User: user }).ne('status', 0);
     return [ 0, '所有需求信息返回成功', NeedResult, results[1], results[2] ];
   }
   // 所有需求信息
@@ -239,7 +241,7 @@ class NeedService extends Service {
     if (!Teacher) { return [ -2, '你尚未申请做家教，请前往申请' ]; }
     const total = await this.ctx.model.Need.find({ teacher: Teacher }).ne('status', 0).count();
     if (!total) { return [ 400607, '暂无需求信息' ]; }
-    const NeedResult = await this.ctx.model.Need.find({ teacher: Teacher }).ne('status', 0)
+    const NeedResult = await this.ctx.model.Need.find({ teacher: Teacher }).ne('status', 0);
     return [ 0, '所有需求信息返回成功', NeedResult, results[1], results[2] ];
   }
   // 所有需求信息
@@ -251,7 +253,7 @@ class NeedService extends Service {
     if (!user) { return [ -2, '用户不存在' ]; }
     const total = await this.ctx.model.Need.find({}).ne('status', 0).count();
     if (!total) { return [ 400607, '暂无需求信息' ]; }
-    const NeedResult = await this.ctx.model.Need.find({}).ne('status', 0)
+    const NeedResult = await this.ctx.model.Need.find({}).ne('status', 0);
     return [ 0, '所有需求信息返回成功', NeedResult, results[1], results[2] ];
   }
 }
