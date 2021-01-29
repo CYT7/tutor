@@ -233,10 +233,15 @@ class NeedService extends Service {
     if (page < 1) { page = 1; }
     const NeedResult = await this.ctx.model.Need.find({ User: user }).ne('status', 0).skip((page - 1) * pageSize)
       .limit(pageSize);
+    if (!Number(page)) {
+      page = 1;
+    } else {
+      page = Number(page);
+    }
     return [ 0, '所有需求信息返回成功', NeedResult, totals, page, results[1], results[2] ];
   }
   // 所有需求信息
-  async Teacherlist() {
+  async Teacherlist(page) {
     const { ctx, app } = this;
     const results = jwt(app, ctx.request.header.authorization);
     if (results[0]) { return [ -1, '请求失败' ]; }
@@ -244,22 +249,42 @@ class NeedService extends Service {
     if (!user) { return [ -2, '用户不存在' ]; }
     const Teacher = await ctx.model.Teacher.findOne({ User: user });
     if (!Teacher) { return [ -2, '你尚未申请做家教，请前往申请' ]; }
+    const { pageSize } = this.config.paginatorConfig;
     const total = await this.ctx.model.Need.find({ teacher: Teacher }).ne('status', 0).count();
     if (!total) { return [ 400607, '暂无需求信息' ]; }
-    const NeedResult = await this.ctx.model.Need.find({ teacher: Teacher }).ne('status', 0);
-    return [ 0, '所有需求信息返回成功', NeedResult, results[1], results[2] ];
+    const totals = Math.ceil(total / pageSize);
+    if (page > totals) { return [ -2, '无效页码' ]; }
+    if (page < 1) { page = 1; }
+    const NeedResult = await this.ctx.model.Need.find({ teacher: Teacher }).ne('status', 0).skip((page - 1) * pageSize)
+      .limit(pageSize);
+    if (!Number(page)) {
+      page = 1;
+    } else {
+      page = Number(page);
+    }
+    return [ 0, '所有需求信息返回成功', NeedResult, totals, page, results[1], results[2] ];
   }
   // 所有需求信息
-  async List() {
+  async List(page) {
     const { ctx, app } = this;
     const results = jwt(app, ctx.request.header.authorization);
     if (results[0]) { return [ -1, '请求失败' ]; }
     const user = await ctx.model.User.findOne({ id: results[3] }).ne('status', 0);
     if (!user) { return [ -2, '用户不存在' ]; }
+    const { pageSize } = this.config.paginatorConfig;
     const total = await this.ctx.model.Need.find({}).ne('status', 0).count();
     if (!total) { return [ 400607, '暂无需求信息' ]; }
-    const NeedResult = await this.ctx.model.Need.find({}).ne('status', 0);
-    return [ 0, '所有需求信息返回成功', NeedResult, results[1], results[2] ];
+    const totals = Math.ceil(total / pageSize);
+    if (page > totals) { return [ -2, '无效页码' ]; }
+    if (page < 1) { page = 1; }
+    const NeedResult = await this.ctx.model.Need.find({}).ne('status', 0).skip((page - 1) * pageSize)
+      .limit(pageSize);
+    if (!Number(page)) {
+      page = 1;
+    } else {
+      page = Number(page);
+    }
+    return [ 0, '所有需求信息返回成功', NeedResult, totals, page, results[1], results[2] ];
   }
 }
 module.exports = NeedService;

@@ -53,10 +53,10 @@ class TeacherController extends Controller {
   // 所有教师信息列表
   async list() {
     const { ctx } = this;
-    const res = await ctx.service.teacher.ListOfUser(ctx.request.query);
+    const res = await ctx.service.teacher.ListOfUser(ctx.request.query.page);
     if (res) {
       ctx.status = 201;
-      ctx.body = { code: res[0], msg: res[1], data: res[2], token: res[3], exp: res[4] };
+      ctx.body = { code: res[0], msg: res[1], data: res[2], totals: res[3], page: res[4], token: res[3], exp: res[4] };
     } else {
       ctx.body = { code: res[0], msg: res[1] };
     }

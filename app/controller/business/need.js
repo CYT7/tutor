@@ -100,7 +100,7 @@ class NeedController extends Controller {
     const res = await ctx.service.need.Userlist(ctx.request.query.page);
     if (res) {
       ctx.status = 201;
-      ctx.body = { code: res[0], msg: res[1], data: res[2], totals: res[3], page: res[4], token: res[3], exp: res[4] };
+      ctx.body = { code: res[0], msg: res[1], data: res[2], totals: res[3], page: res[4], token: res[5], exp: res[6] };
     } else {
       ctx.body = { code: res[0], msg: res[1] };
     }
@@ -108,10 +108,10 @@ class NeedController extends Controller {
   // 老师查看自已所有需求信息
   async Teacherlist() {
     const { ctx } = this;
-    const res = await ctx.service.need.Teacherlist(ctx.request.query);
+    const res = await ctx.service.need.Teacherlist(ctx.request.query.page);
     if (res) {
       ctx.status = 201;
-      ctx.body = { code: res[0], msg: res[1], data: res[2], token: res[3], exp: res[4] };
+      ctx.body = { code: res[0], msg: res[1], data: res[2], totals: res[3], page: res[4], token: res[5], exp: res[6] };
     } else {
       ctx.body = { code: res[0], msg: res[1] };
     }
@@ -119,10 +119,10 @@ class NeedController extends Controller {
   // 用户查看所有需求信息
   async List() {
     const { ctx } = this;
-    const res = await ctx.service.need.List(ctx.request.query);
+    const res = await ctx.service.need.List(ctx.request.query.page);
     if (res) {
       ctx.status = 201;
-      ctx.body = { code: res[0], msg: res[1], data: res[2], token: res[3], exp: res[4] };
+      ctx.body = { code: res[0], msg: res[1], data: res[2], totals: res[3], page: res[4], token: res[5], exp: res[6] };
     } else {
       ctx.body = { code: res[0], msg: res[1] };
     }
