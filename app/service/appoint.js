@@ -45,7 +45,7 @@ class AppointService extends Service {
     if (!user) { return [ -2, '不存在用户' ]; }
     const teacher = await ctx.model.Teacher.findOne({ User: user }).ne('status', 0);
     if (!teacher) { return [ -2, '你不是老师' ]; }
-    const result = await ctx.model.Appoint.findOne({ teacher, id: params.id, status: 0 }).ne('status', 0);
+    const result = await ctx.model.Appoint.findOne({ teacher, id: params.id, state: 0 }).ne('status', 0);
     if (!result) { return [ 400616, '查无此预约信息' ]; }
     await this.ctx.model.Appoint.updateOne({ id: params.id }, { state: 1 });
     return [ 0, '老师同意预约', results[1], results[2] ];
@@ -59,7 +59,7 @@ class AppointService extends Service {
     if (!user) { return [ -2, '不存在用户' ]; }
     const teacher = await ctx.model.Teacher.findOne({ User: user }).ne('status', 0);
     if (!teacher) { return [ -2, '你不是老师' ]; }
-    const result = await ctx.model.Appoint.findOne({ teacher, id: params.id, status: 0 }).ne('status', 0);
+    const result = await ctx.model.Appoint.findOne({ teacher, id: params.id, state: 0 }).ne('status', 0);
     if (!result) { return [ 400616, '查无此预约信息' ]; }
     await this.ctx.model.Appoint.updateOne({ id: params.id }, { state: 4 });
     return [ 0, '老师不同意预约', results[1], results[2] ];
@@ -71,8 +71,8 @@ class AppointService extends Service {
     if (results[0]) { return [ -1, '请求失败' ]; }
     const user = await ctx.model.User.findOne({ id: results[3] }).ne('status', 0);
     if (!user) { return [ -2, '不存在用户' ]; }
-    const result = await ctx.model.Appoint.findOne({ student: user, id: params.id, status: 1 }).ne('status', 0);
-    if (!result) { return [ 400614, '查无此预约信息' ]; }
+    const result = await ctx.model.Appoint.findOne({ student: user, id: params.id, state: 1 }).ne('status', 0);
+    if (!result) { return [ 400614, '预约异常，请稍后再试' ]; }
     const appointPrice = result.totalPrice;
     if (user.balance < appointPrice) { return [ 400614, '余额不足，请充值' ]; }
     user.balance -= appointPrice;
@@ -87,24 +87,79 @@ class AppointService extends Service {
     if (results[0]) { return [ -1, '请求失败' ]; }
     const user = await ctx.model.User.findOne({ id: results[3] }).ne('status', 0);
     if (!user) { return [ -2, '不存在用户' ]; }
-    const teacher = await ctx.model.Teacher.findOne({ User: user }).ne('status', 0);
+    const teacher = await ctx.model.Teacher.findOne({ User: user }).populate({ path: 'User', select: 'balance' }).ne('status', 0);
     if (!teacher) { return [ -2, '你不是老师' ]; }
-    const result = await ctx.model.Appoint.findOne({ teacher, id: params.id, status: 2 }).ne('status', 0);
+    const result = await ctx.model.Appoint.findOne({ teacher, id: params.id, state: 2 }).ne('status', 0);
     if (!result) { return [ 400613, '查无此预约信息' ]; }
+    teacher.User.balance += result.totalPrice;
+    teacher.save();
     await this.ctx.model.Appoint.updateOne({ id: params.id }, { state: 3 });
     return [ 0, '预约已经完成了', results[1], results[2] ];
   }
   // 关闭预约
-  async close(params) {
+  async teacherClose(params) {
+    const { ctx, app } = this;
+    const results = jwt(app, ctx.request.header.authorization);
+    if (results[0]) { return [ -1, '请求失败' ]; }
+    const user = await ctx.model.User.findOne({ id: results[3] }).ne('status', 0);
+    if (!user) { return [ -2, '不存在用户' ]; }
+    const teacher = await ctx.model.Teacher.findOne({ User: user }).ne('status', 0);
+    if (!teacher) { return [ -2, '你不是老师' ]; }
+    const result = await ctx.model.Appoint.findOne({ id: params.id }).ne('status', 0);
+    if (!result) { return [ 400612, '关闭预约失败，请稍后再试' ]; }
+    const User = await ctx.model.User.findOne({ _id: result.student });
+    // eslint-disable-next-line default-case
+    switch (result.state) {
+      case 0:
+        result.state = 4;
+        result.save();
+        return [ 0, '预约关闭成功', results[1], results[2] ];
+      case 1:
+        result.state = 4;
+        result.save();
+        return [ 0, '预约关闭成功', results[1], results[2] ];
+      case 2:
+        User.balance += result.totalPrice;
+        User.save();
+        result.state = 4;
+        result.save();
+        return [ 0, '预约关闭成功', results[1], results[2] ];
+      case 3:
+        return [ 400612, '关闭预约失败，该预约已完成' ];
+      case 4:
+        return [ 400612, '关闭预约失败，该预约已关闭' ];
+    }
+  }
+  // 关闭预约
+  async userClose(params) {
     const { ctx, app } = this;
     const results = jwt(app, ctx.request.header.authorization);
     if (results[0]) { return [ -1, '请求失败' ]; }
     const user = await ctx.model.User.findOne({ id: results[3] }).ne('status', 0);
     if (!user) { return [ -2, '不存在用户' ]; }
     const result = await ctx.model.Appoint.findOne({ student: user, id: params.id }).ne('status', 0);
-    if (!result) { return [ 400612, '查无此预约信息' ]; }
-    await this.ctx.model.Appoint.updateOne({ id: params.id }, { state: 4 });
-    return [ 0, '预约已经关闭', results[1], results[2] ];
+    if (!result) { return [ 400612, '关闭预约失败，请稍后再试' ]; }
+    // eslint-disable-next-line default-case
+    switch (result.state) {
+      case 0:
+        result.state = 4;
+        result.save();
+        return [ 0, '预约关闭成功', results[1], results[2] ];
+      case 1:
+        result.state = 4;
+        result.save();
+        return [ 0, '预约关闭成功', results[1], results[2] ];
+      case 2:
+        user.balance += result.totalPrice;
+        user.save();
+        result.state = 4;
+        result.save();
+        return [ 0, '预约关闭成功', results[1], results[2] ];
+      case 3:
+        return [ 400612, '关闭预约失败，该预约已完成' ];
+      case 4:
+        return [ 400612, '关闭预约失败，该预约已关闭' ];
+    }
   }
   // 老师查看某一预约
   async teacherSee(params) {

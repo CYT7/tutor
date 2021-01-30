@@ -78,18 +78,29 @@ class AppointController extends Controller {
     const res = await ctx.service.appoint.finish(ctx.request.body);
     if (res) {
       ctx.status = 201;
-      ctx.body = { code: res[0], msg: res[1], token:res[2], exp:res[3] };
+      ctx.body = { code: res[0], msg: res[1], token: res[2], exp: res[3] };
     } else {
       ctx.body = { code: res[0], msg: res[1] };
     }
   }
   // 关闭预约
-  async close() {
+  async userClose() {
     const { ctx } = this;
-    const res = await ctx.service.appoint.close(ctx.request.body);
+    const res = await ctx.service.appoint.userClose(ctx.request.body);
     if (res) {
       ctx.status = 201;
-      ctx.body = { code: res[0], msg: res[1], token:res[2], exp:res[3] };
+      ctx.body = { code: res[0], msg: res[1], token: res[2], exp: res[3] };
+    } else {
+      ctx.body = { code: res[0], msg: res[1] };
+    }
+  }
+  // 关闭预约
+  async teacherClose() {
+    const { ctx } = this;
+    const res = await ctx.service.appoint.teacherClose(ctx.request.body);
+    if (res) {
+      ctx.status = 201;
+      ctx.body = { code: res[0], msg: res[1], token: res[2], exp: res[3] };
     } else {
       ctx.body = { code: res[0], msg: res[1] };
     }

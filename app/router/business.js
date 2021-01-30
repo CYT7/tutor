@@ -55,7 +55,8 @@ module.exports = app => {
   router.post(`${appointApi}/teacherSee`, controller.business.appoint.teacherSee);
   router.post(`${appointApi}/userSee`, controller.business.appoint.userSee);
   router.post(`${appointApi}/finish`, controller.business.appoint.finish);
-  router.post(`${appointApi}/close`, controller.business.appoint.close);
+  router.post(`${appointApi}/userClose`, controller.business.appoint.userClose);
+  router.post(`${appointApi}/teacherClose`, controller.business.appoint.teacherClose);
   router.get(`${appointApi}/userList`, controller.business.appoint.userList);
   router.get(`${appointApi}/teacherList`, controller.business.appoint.teacherList);
 

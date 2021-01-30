@@ -12,7 +12,7 @@ module.exports = app => {
     id: { type: String },
     student: { type: Schema.Types.ObjectId, ref: 'User' }, // 家长id
     teacher: { type: Schema.Types.ObjectId, ref: 'Teacher' }, // 老师id
-    state: { type: Number, default: 0 }, // 状态 0未预约 1已预约 待付款 2进行中 3已完成 4已关闭
+    state: { type: Number, default: 0 }, // 状态 0未预约 1已预约 2进行中 3已完成 4已关闭
     status: { type: Number, default: 1 }, // 状态 0禁用 1启用
     frequency: { type: Number, default: 0 }, // 总共几次
     timeHour: { type: Number, default: 0 }, // 每次几小时
