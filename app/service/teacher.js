@@ -56,7 +56,7 @@ class TeacherService extends Service {
     if (!user) { return [ -2, '不存在用户' ]; }
     const teacher = await ctx.model.Teacher.findOne({ User: user });
     if (!teacher) { return [ 400503, '你尚未申请做家教，请前往申请' ]; }
-    const checkParams = [ 'experience', 'age', 'goodAt', 'hourPrice' ];
+    const checkParams = [ 'experience', 'age', 'goodAt', 'hourPrice', 'city' ];
     const newData = new Map();
     const paramsMap = new Map(Object.entries(params));
     const newTeacher = new Map(Object.entries(teacher.toObject()));

@@ -18,7 +18,7 @@ module.exports = app => {
     state: { type: Number, default: 1 }, // 审核状态 1已提交 2审核不通过 3审核通过
     hourPrice: { type: Number }, // 课时费用
     school: { type: String, default: null }, // 在读/毕业院校
-    city: { type: String, default: null }, // 所在城市
+    city: { type: Array, default: null }, // 所在城市
     status: { type: Number, default: 1 }, // 状态 0禁用 1正常
     createTime: { type: Number, default: null }, // 创建时间
     updateTime: { type: Number, default: null }, // 更新时间
