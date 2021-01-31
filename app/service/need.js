@@ -109,26 +109,51 @@ class NeedService extends Service {
     if (results[0]) { return [ -1, '请求失败' ]; }
     const user = await ctx.model.User.findOne({ id: results[3] }).ne('status', 0);
     if (!user) { return [ -2, '用户不存在' ]; }
-    const need = await ctx.model.Need.findOne({ id: params.id, state: 4 });
+    const need = await ctx.model.Need.findOne({ id: params.id, state: 4 }).ne('status', 0);
+    if (!need) { return [ 400604, '查无此需求' ]; }
     const appointPrice = need.totalPrice;
     if (user.balance < appointPrice) { return [ 400604, '余额不足，需求无法完成，请充值' ]; }
     user.balance -= appointPrice;
     user.save();
-    if (!need) { return [ 400604, '查无此需求' ]; }
+    const teacher = await ctx.model.Teacher.findOne({ _id: need.teacher }).populate({ path: 'User', select: 'balance' });
+    teacher.User.balance += appointPrice;
+    teacher.save();
     await this.ctx.model.Need.updateOne({ id: need.id }, { state: 5 });
     return [ 0, `${need.id} 需求已经完成`, results[1], results[2] ];
   }
   // 关闭需求
-  async close(params) {
+  async userClose(params) {
     const { ctx, app } = this;
     const results = jwt(app, ctx.request.header.authorization);
     if (results[0]) { return [ -1, '请求失败' ]; }
     const user = await ctx.model.User.findOne({ id: results[3] }).ne('status', 0);
     if (!user) { return [ -2, '用户不存在' ]; }
-    const need = await ctx.model.Need.findOne({ id: params.id }).ne('state', 6);
+    const need = await ctx.model.Need.findOne({ id: params.id, status: 1 }).ne('state', 6);
     if (!need) { return [ 400605, '查无此需求' ]; }
-    await this.ctx.model.Need.updateOne({ id: need.id }, { state: 6, reason: params.reason });
-    return [ 0, `${need.id} 需求已经关闭`, results[1], results[2] ];
+    if (need.state !== 5) {
+      need.state = 6;
+      need.save();
+      return [ 0, '需求关闭成功', results[1], results[2] ];
+    }
+    return [ 400605, '需求关闭异常，请稍后再试' ];
+  }
+  // 关闭需求
+  async teacherClose(params) {
+    const { ctx, app } = this;
+    const results = jwt(app, ctx.request.header.authorization);
+    if (results[0]) { return [ -1, '请求失败' ]; }
+    const user = await ctx.model.User.findOne({ id: results[3] }).ne('status', 0);
+    if (!user) { return [ -2, '用户不存在' ]; }
+    const teacher = await ctx.model.Teacher.findOne({ User: user }).ne('status', 0);
+    if (!teacher) { return [ -2, '你不是老师' ]; }
+    const need = await ctx.model.Need.findOne({ id: params.id, status: 1 }).ne('state', 6);
+    if (!need) { return [ 400605, '查无此需求' ]; }
+    if (need.state !== 5) {
+      need.state = 6;
+      need.save();
+      return [ 0, '需求关闭成功', results[1], results[2] ];
+    }
+    return [ 400605, '需求关闭异常，请稍后再试' ];
   }
   // 修改需求（审核不通过）
   async modify(params) {

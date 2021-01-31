@@ -40,9 +40,20 @@ class NeedController extends Controller {
     }
   }
   // 关闭需求
-  async close() {
+  async userClose() {
     const { ctx } = this;
-    const res = await ctx.service.need.close(ctx.request.body);
+    const res = await ctx.service.need.userClose(ctx.request.body);
+    if (res) {
+      ctx.status = 201;
+      ctx.body = { code: res[0], msg: res[1], token: res[2], exp: res[3] };
+    } else {
+      ctx.body = { code: res[0], msg: res[1] };
+    }
+  }
+  // 关闭需求
+  async teacherClose() {
+    const { ctx } = this;
+    const res = await ctx.service.need.teacherClose(ctx.request.body);
     if (res) {
       ctx.status = 201;
       ctx.body = { code: res[0], msg: res[1], token: res[2], exp: res[3] };

@@ -11,7 +11,6 @@ module.exports = app => {
   const UserSchema = new Schema({
     id: Number,
     nickName: { type: String, default: null }, // 昵称
-    realName: { type: String, default: null }, // 真实姓名
     phone: { type: String, default: null }, // 联系方式
     email: { type: String, default: null }, // 邮箱
     password: String, // 密码

@@ -103,7 +103,7 @@ class UserService extends Service {
       params.password = md5(params.newPassword);
       if (oldPwd === params.password) { return [ 400403, '新密码不得和旧密码一模一样，请重新输入' ]; }
     }
-    const checkParams = [ 'nickName', 'realName', 'phone', 'email', 'password', 'qq', 'wechat', 'address', 'gender' ];
+    const checkParams = [ 'nickName', 'phone', 'email', 'password', 'qq', 'wechat', 'address', 'gender' ];
     const newData = new Map();
     const paramsMap = new Map(Object.entries(params));
     const newUser = new Map(Object.entries(user.toObject()));

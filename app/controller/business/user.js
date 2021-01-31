@@ -67,9 +67,9 @@ class UserController extends Controller {
       files = Object.assign(files, { [fieldname]: dir.saveDir });
     }
     if (Object.keys(files).length > 0) {
-      ctx.body = { code: 0, message: '用户上传头像成功', data: files };
+      ctx.body = { code: 0, msg: '用户上传头像成功', data: files };
     } else {
-      ctx.body = { code: 400404, message: '用户上传头像失败', data: {} };
+      ctx.body = { code: 400404, msg: '用户上传头像失败', data: {} };
     }
   }
 }

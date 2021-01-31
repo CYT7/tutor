@@ -27,10 +27,10 @@ module.exports = appInfo => {
     },
     domainWhiteList: [ '*' ], // 允许访问接口的白名单
   };
-  // 跨域配置
+  // 跨域的配置
   config.cors = {
     origin: '*',
-    allowMethods: 'GET,HEAD,PUT,POST,DELETE,PATCH,OPTIONS',
+    allowMethods: 'GET,HEAD,PUT,POST,DELETE,PATCH',
   };
   // MongoDB config MongoDB配置
   config.mongoose = {
@@ -65,7 +65,7 @@ module.exports = appInfo => {
     ignore: [ '/business', '/admin/login', '/public' ],
   };
   config.userAuth = {
-    enable: true,
+    enable: false,
     ignore: [ '/admin', '/business/user/login', '/business/user/create', '/public' ],
   };
   return {
