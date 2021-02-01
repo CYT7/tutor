@@ -47,6 +47,14 @@ class NeedService extends Service {
     if (!teacher) { return [ 400601, 'sorry，你暂无执教资格，请前往申请' ]; }
     const need = await ctx.model.Need.findOne({ id: params.id, state: 3 }).ne('status', 0);
     if (!need) { return [ 400601, 'sorry,查无此需求' ]; }
+    const find = await ctx.model.Application.findOne({ Teacher: teacher });
+    if (find) { return [ 400601, '你已经应聘了' ]; }
+    const newApplication = new ctx.model.Application({
+      Need: need,
+      Teacher: teacher,
+      createTime: Math.round(new Date() / 1000),
+    });
+    newApplication.save();
     if (teacher.id === need.appoint) { return [ 400601, '你已经申请了' ]; }
     need.appoint = teacher.id;
     need.save();
@@ -297,12 +305,12 @@ class NeedService extends Service {
     const user = await ctx.model.User.findOne({ id: results[3] }).ne('status', 0);
     if (!user) { return [ -2, '用户不存在' ]; }
     const { pageSize } = this.config.paginatorConfig;
-    const total = await this.ctx.model.Need.find({}).ne('status', 0).count();
+    const total = await this.ctx.model.Need.find({ state: 3 }).ne('status', 0).count();
     if (!total) { return [ 400607, '暂无需求信息' ]; }
     const totals = Math.ceil(total / pageSize);
     if (page > totals) { return [ -2, '无效页码' ]; }
     if (page < 1) { page = 1; }
-    const NeedResult = await this.ctx.model.Need.find({}).ne('status', 0).skip((page - 1) * pageSize)
+    const NeedResult = await this.ctx.model.Need.find({ state: 3 }).ne('status', 0).skip((page - 1) * pageSize)
       .limit(pageSize);
     if (!Number(page)) {
       page = 1;

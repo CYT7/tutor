@@ -24,7 +24,6 @@ module.exports = app => {
     timeHour: { type: Number, default: 0 }, // 每次几小时(必选)
     hourPrice: { type: Number, default: 0 }, // 每小时几元(必选)
     totalPrice: { type: Number, default: 0 }, // 总报价(必选)
-    appoint: { type: String, default: null }, // 预约人
     state: { type: Number, default: 1 }, // 审核状态 1审核中,2审核不通过，3审核通过，4已选定，5已完成，6已关闭。
     sort: { type: Number, default: 0 }, // 排序
     deleted: { type: Number, default: 0 }, // 家长是否已软删除 0否 1是
