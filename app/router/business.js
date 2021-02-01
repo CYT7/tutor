@@ -26,6 +26,8 @@ module.exports = app => {
   router.post(`${teacherApi}/information`, controller.business.teacher.information);
   router.put(`${teacherApi}/information`, controller.business.teacher.modify);
   router.post(`${teacherApi}/Information`, controller.business.teacher.informationofUser);
+  router.post(`${teacherApi}/identityCard1`, controller.business.teacher.identityCard1);
+  router.post(`${teacherApi}/identityCard2`, controller.business.teacher.identityCard2);
   router.get(`${teacherApi}/list`, controller.business.teacher.list);
   router.get(`${teacherApi}/recommendList`, controller.business.teacher.listOfRecommend);
 
@@ -38,6 +40,7 @@ module.exports = app => {
   router.post(`${needApi}/confirm`, controller.business.need.confirm);
   router.post(`${needApi}/finish`, controller.business.need.finish);
   router.post(`${needApi}/information`, controller.business.need.information);
+  router.post(`${needApi}/application`, controller.business.need.application);
   router.post(`${needApi}/userClose`, controller.business.need.userClose);
   router.post(`${needApi}/teacherClose`, controller.business.need.teacherClose);
   router.put(`${needApi}/modify`, controller.business.need.modify);

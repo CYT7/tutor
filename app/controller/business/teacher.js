@@ -4,6 +4,8 @@
  * @CompletionDate：2020/01/26 4:00PM
  */
 'use strict';
+const fs = require('fs');
+const pump = require('pump');
 const Controller = require('egg').Controller;
 class TeacherController extends Controller {
   // 创建teacher
@@ -72,6 +74,47 @@ class TeacherController extends Controller {
       ctx.body = { code: res[0], msg: res[1] };
     }
   }
-
+  // 身份证正面照
+  async identityCard1() {
+    const { ctx } = this;
+    const parts = ctx.multipart({ autoFields: true });
+    let files = {};
+    let stream;
+    while ((stream = await parts()) != null) {
+      if (!stream.filename) { break; }
+      const fieldname = stream.fieldname; // file表单的名字
+      const dir = await this.service.teacher.identityCard1(stream.filename);// 上传图片的目录
+      const target = dir.uploadDir;
+      const writeStream = fs.createWriteStream(target);
+      await pump(stream, writeStream);
+      files = Object.assign(files, { [fieldname]: dir.saveDir });
+    }
+    if (Object.keys(files).length > 0) {
+      ctx.body = { code: 0, msg: '用户上传身份证成功', data: files };
+    } else {
+      ctx.body = { code: 400404, msg: '用户上传身份证失败', data: {} };
+    }
+  }
+  // 身份证反面照
+  async identityCard2() {
+    const { ctx } = this;
+    const parts = ctx.multipart({ autoFields: true });
+    let files = {};
+    let stream;
+    while ((stream = await parts()) != null) {
+      if (!stream.filename) { break; }
+      const fieldname = stream.fieldname; // file表单的名字
+      const dir = await this.service.teacher.identityCard2(stream.filename);// 上传图片的目录
+      const target = dir.uploadDir;
+      const writeStream = fs.createWriteStream(target);
+      await pump(stream, writeStream);
+      files = Object.assign(files, { [fieldname]: dir.saveDir });
+    }
+    if (Object.keys(files).length > 0) {
+      ctx.body = { code: 0, msg: '用户上传身份证成功', data: files };
+    } else {
+      ctx.body = { code: 400404, msg: '用户上传身份证失败', data: {} };
+    }
+  }
 }
 module.exports = TeacherController;

@@ -4,8 +4,13 @@
  * @CompletionDate：2020/01/26 4:00PM
  */
 'use strict';
+
 const Service = require('egg').Service;
 const jwt = require('../utils/jwt');
+const path = require('path');
+const sd = require('silly-datetime');
+const mkdirp = require('mkdirp');
+
 class TeacherService extends Service {
   // 创建老师
   async create(params) {
@@ -18,6 +23,7 @@ class TeacherService extends Service {
     const newTeacher = new ctx.model.Teacher({
       User: user,
       experience: params.experience,
+      realName: params.realName,
       age: params.age,
       hourPrice: params.hourPrice,
       goodAt: params.goodAt,
@@ -29,6 +35,8 @@ class TeacherService extends Service {
       newTeacher.id = 'T' + new Date().getFullYear().toString()
         .substr(2, 2) + '01';
       newTeacher.save();
+      user.type = 1;
+      user.save();
       return [ 0, `${user.nickName} 申请做家教成功，请等待管理员审核`, results[1], results[2] ];
     }
     const Id = Number(teacher[0].id.substr(1));
@@ -163,6 +171,42 @@ class TeacherService extends Service {
     const result = await this.ctx.model.Teacher.find({}).populate({ path: 'User', select: { _id: 0, password: 0, id: 0 } }).sort({ totalSuccess: -1 })
       .limit(10);
     return [ 0, '所有教师信息返回成功', result, total, results[1], results[2] ];
+  }
+  // 上传身份证正面照
+  async identityCard1(filename) {
+    const { ctx, app } = this;
+    const results = jwt(app, ctx.request.header.authorization);
+    if (results[0]) { return [ -1, '请求失败' ]; }
+    const user = await ctx.model.User.findOne({ id: results[3] }).ne('status', 0);
+    if (!user) { return [ -2, '用户不存在' ]; }
+    const teacher = await ctx.model.Teacher.findOne({ User: user });
+    if (!teacher) { return [ 400503, '你尚未申请做家教，请前往申请' ]; }
+    const day = sd.format(new Date(), 'YYYYMMDD');// 获取当前日期
+    const dir = path.join(this.config.uploadDir, day);// 创建图片保存的路径
+    await mkdirp(dir);// 不存在就创建目录
+    const date = Date.now();// 毫秒数
+    const uploadDir = path.join(dir, date + path.extname(filename));
+    const saveDir = this.ctx.origin + uploadDir.slice(3).replace(/\\/g, '/');
+    await this.ctx.model.Teacher.updateOne({ id: teacher.id }, { identityCard1: saveDir });
+    return { uploadDir, saveDir };
+  }
+  // 上传身份证反面照
+  async identityCard2(filename) {
+    const { ctx, app } = this;
+    const results = jwt(app, ctx.request.header.authorization);
+    if (results[0]) { return [ -1, '请求失败' ]; }
+    const user = await ctx.model.User.findOne({ id: results[3] }).ne('status', 0);
+    if (!user) { return [ -2, '用户不存在' ]; }
+    const teacher = await ctx.model.Teacher.findOne({ User: user });
+    if (!teacher) { return [ 400503, '你尚未申请做家教，请前往申请' ]; }
+    const day = sd.format(new Date(), 'YYYYMMDD');// 获取当前日期
+    const dir = path.join(this.config.uploadDir, day);// 创建图片保存的路径
+    await mkdirp(dir);// 不存在就创建目录
+    const date = Date.now();// 毫秒数
+    const uploadDir = path.join(dir, date + path.extname(filename));
+    const saveDir = this.ctx.origin + uploadDir.slice(3).replace(/\\/g, '/');
+    await this.ctx.model.Teacher.updateOne({ id: teacher.id }, { identityCard2: saveDir });
+    return { uploadDir, saveDir };
   }
 }
 module.exports = TeacherService;

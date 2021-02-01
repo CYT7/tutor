@@ -71,6 +71,19 @@ class NeedService extends Service {
     if (!need) { return [ 400602, '查无此需求' ]; }
     return [ 0, `${need.id} 返回信息成功`, need, results[1], results[2] ];
   }
+  // 查看需求信息
+  async application(params) {
+    const { ctx, app } = this;
+    const results = jwt(app, ctx.request.header.authorization);
+    if (results[0]) { return [ -1, '请求失败' ]; }
+    const user = await ctx.model.User.findOne({ id: results[3] }).ne('status', 0);
+    if (!user) { return [ -2, '不存在用户' ]; }
+    const need = await ctx.model.Need.findOne({ id: params.id, state: 3 });
+    if (!need) { return [ 400602, '查无此需求' ]; }
+    const result = await ctx.model.Application.find({ Need: need }).populate({ path: 'Teacher', select: { _id: 0, User: 0 } });
+    if (!result) { return [ 400602, '暂无老师应聘' ]; }
+    return [ 0, '返回应聘者信息成功', result, results[1], results[2] ];
+  }
   // 审核需求 - 通过
   async agree(params) {
     const { ctx, app } = this;
@@ -102,12 +115,14 @@ class NeedService extends Service {
     if (results[0]) { return [ -1, '请求失败' ]; }
     const user = await ctx.model.User.findOne({ id: results[3] }).ne('status', 0);
     if (!user) { return [ -2, '用户不存在' ]; }
-    const need = await ctx.model.Need.findOne({ id: params.id, state: 3 });
+    const application = await ctx.model.Application.findOne({ _id: params._id });
+    if (!application) { return [ 400603, '应聘数据异常，请稍后再试' ]; }
+    const need = await ctx.model.Need.findOne({ _id: application.Need });
     if (!need) { return [ 400603, '查无此需求' ]; }
-    const Teacher = await ctx.model.Teacher.findOne({ id: params.teacherId }).ne('status', 0);
+    const Teacher = await ctx.model.Teacher.findOne({ _id: application.Teacher }).ne('status', 0);
     if (!Teacher) { return [ 400603, '查无此老师' ]; }
     await this.ctx.model.Need.updateOne({ id: need.id }, { state: 4, teacher: Teacher });
-    return [ 0, '此需求已经选定老师', results[1], results[2] ];
+    return [ 0, '此需求选定老师成功', results[1], results[2] ];
   }
 
   // 需求已完成

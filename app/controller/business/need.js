@@ -94,6 +94,17 @@ class NeedController extends Controller {
       ctx.body = { code: res[0], msg: res[1] };
     }
   }
+  // 用户查看应聘者
+  async application() {
+    const { ctx } = this;
+    const res = await ctx.service.need.application(ctx.request.body);
+    if (res) {
+      ctx.status = 201;
+      ctx.body = { code: res[0], msg: res[1], data: res[2], token: res[3], exp: res[4] };
+    } else {
+      ctx.body = { code: res[0], msg: res[1] };
+    }
+  }
   // 主页查看推荐需求信息
   async list() {
     const { ctx } = this;

@@ -20,6 +20,7 @@ module.exports = app => {
     balance: { type: Number, default: 0 }, // 余额
     gender: { type: Number, default: 0 }, // 性别 0 未知，1男 2女
     status: { type: Number, default: 1 }, // 状态 1 正常 0 禁用
+    type: { type: Number, default: 0 }, // 性别 0 仅学生，1学生老师
     image_url: { type: String, default: null }, // 头像地址
     createTime: { type: Number, default: null }, // 创建时间
     loginTime: { type: Number, default: null }, // 最后登录时间
