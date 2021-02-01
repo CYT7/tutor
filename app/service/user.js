@@ -154,7 +154,7 @@ class UserService extends Service {
     if (param.balance) {
       user.balance += param.balance;
       user.save();
-      return [ 0, `余额：+${param.balance / 100}元` ];
+      return [ 0, `余额：+${param.balance}元`, results[1], results[2] ];
     }
     return [ -1, '增加失败，请增加固定金额' ];
   }

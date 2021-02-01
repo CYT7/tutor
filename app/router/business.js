@@ -17,7 +17,7 @@ module.exports = app => {
   router.post(`${userApi}/information`, controller.business.user.information);
   router.put(`${userApi}/modify`, controller.business.user.modify);
   router.post(`${userApi}/saveAvatar`, controller.business.user.saveAvatar);
-
+  router.post(`${userApi}/balanceAdd`, controller.business.user.balanceAdd);
   /**
    * 教师相关接口
    **/
