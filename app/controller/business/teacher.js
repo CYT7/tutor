@@ -67,7 +67,7 @@ class TeacherController extends Controller {
   async search() {
     const { ctx } = this;
     const page = ctx.request.query.page || 1;
-    let params = ctx.request.body;
+    const params = ctx.request.body;
     const res = await ctx.service.teacher.search(params, page);
     if (res) {
       ctx.status = 201;

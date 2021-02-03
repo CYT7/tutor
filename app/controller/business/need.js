@@ -149,5 +149,18 @@ class NeedController extends Controller {
       ctx.body = { code: res[0], msg: res[1] };
     }
   }
+  // 用户查看所有需求信息
+  async search() {
+    const { ctx } = this;
+    const page = ctx.request.query.page || 1;
+    const params = ctx.request.body;
+    const res = await ctx.service.need.search(params, page);
+    if (res) {
+      ctx.status = 201;
+      ctx.body = { code: res[0], msg: res[1], data: res[2], totals: res[3], page: res[4], token: res[5], exp: res[6] };
+    } else {
+      ctx.body = { code: res[0], msg: res[1] };
+    }
+  }
 }
 module.exports = NeedController;

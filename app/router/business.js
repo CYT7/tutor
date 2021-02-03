@@ -44,6 +44,7 @@ module.exports = app => {
   router.post(`${needApi}/application`, controller.business.need.application);
   router.post(`${needApi}/userClose`, controller.business.need.userClose);
   router.post(`${needApi}/teacherClose`, controller.business.need.teacherClose);
+  router.post(`${needApi}/search`, controller.business.need.search);
   router.put(`${needApi}/modify`, controller.business.need.modify);
   router.get(`${needApi}/list`, controller.business.need.list);
   router.get(`${needApi}/Userlist`, controller.business.need.Userlist);

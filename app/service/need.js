@@ -15,7 +15,7 @@ class NeedService extends Service {
     const user = await ctx.model.User.findOne({ id: results[3] }).ne('status', 0);
     if (!user) { return [ -2, '不存在用户' ]; }
     const need = await ctx.model.Need.create({
-      id: Date.now().toString(36)+Math.random().toString(36).substr(3, 5),
+      id: Date.now().toString(36) + Math.random().toString(36).substr(3, 5),
       User: user,
       nickName: params.nickName,
       phone: params.phone,
@@ -313,8 +313,6 @@ class NeedService extends Service {
     const { ctx, app } = this;
     const results = jwt(app, ctx.request.header.authorization);
     if (results[0]) { return [ -1, '请求失败' ]; }
-    const user = await ctx.model.User.findOne({ id: results[3] }).ne('status', 0);
-    if (!user) { return [ -2, '用户不存在' ]; }
     const { pageSize } = this.config.paginatorConfig;
     const total = await this.ctx.model.Need.find({ state: 3 }).ne('status', 0).count();
     if (!total) { return [ 400607, '暂无需求信息' ]; }
@@ -323,6 +321,38 @@ class NeedService extends Service {
     if (page < 1) { page = 1; }
     const NeedResult = await this.ctx.model.Need.find({ state: 3 }).ne('status', 0).skip((page - 1) * pageSize)
       .limit(pageSize);
+    if (!Number(page)) {
+      page = 1;
+    } else {
+      page = Number(page);
+    }
+    return [ 0, '所有需求信息返回成功', NeedResult, totals, page, results[1], results[2] ];
+  }
+  // 所有需求信息
+  async search(params, page) {
+    const { ctx, app } = this;
+    const results = jwt(app, ctx.request.header.authorization);
+    if (results[0]) { return [ -1, '请求失败' ]; }
+    const { pageSize } = this.config.paginatorConfig;
+    let total = null;
+    if (params.name === null) {
+      total = await this.ctx.model.Need.find({ state: 3 }).ne('status', 0).countDocuments();
+      if (!total) { return [ 400607, '暂无需求信息' ]; }
+    } else {
+      total = await this.ctx.model.Need.find({ subject: { $regex: params.name }, state: 3 }).countDocuments();
+      if (!total) { return [ 400607, '暂无需求信息' ]; }
+    }
+    const totals = Math.ceil(total / pageSize);
+    if (page > totals) { return [ -2, '无效页码' ]; }
+    if (page < 1) { page = 1; }
+    let NeedResult = null;
+    if (params.name === null) {
+      NeedResult = await this.ctx.model.Need.find({ state: 3 }).ne('status', 0).skip((page - 1) * pageSize)
+        .limit(pageSize);
+    } else {
+      NeedResult = await this.ctx.model.Need.find({ subject: { $regex: params.name }, state: 3 }).ne('status', 0).skip((page - 1) * pageSize)
+        .limit(pageSize);
+    }
     if (!Number(page)) {
       page = 1;
     } else {

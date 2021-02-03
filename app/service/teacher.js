@@ -153,7 +153,7 @@ class TeacherService extends Service {
       total = await this.ctx.model.Teacher.find({ state: 3 }).countDocuments();
       if (!total) { return [ 404404, '暂无教师信息' ]; }
     } else {
-      total = await this.ctx.model.Teacher.find({ goodAt: { $regex: params.name } , state: 3 }).countDocuments();
+      total = await this.ctx.model.Teacher.find({ goodAt: { $regex: params.name }, state: 3 }).countDocuments();
       if (!total) { return [ 404404, '暂无教师信息' ]; }
     }
     const totals = Math.ceil(total / pageSize);
@@ -163,7 +163,7 @@ class TeacherService extends Service {
     if (params.name === null) {
       result = await this.ctx.model.Teacher.find({ state: 3 }).skip((page - 1) * pageSize).limit(pageSize);
     } else {
-      result = await this.ctx.model.Teacher.find({ goodAt: { $regex: params.name } , state: 3 }).skip((page - 1) * pageSize).limit(pageSize);
+      result = await this.ctx.model.Teacher.find({ goodAt: { $regex: params.name }, state: 3 }).skip((page - 1) * pageSize).limit(pageSize);
     }
     if (!Number(page)) {
       page = 1;
