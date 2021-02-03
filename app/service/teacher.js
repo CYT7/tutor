@@ -128,12 +128,12 @@ class TeacherService extends Service {
     const results = jwt(app, ctx.request.header.authorization);
     if (results[0]) { return [ -3, '请求失败' ]; }
     const { pageSize } = this.config.paginatorConfig;
-    const total = await this.ctx.model.Teacher.find({}).count();
+    const total = await this.ctx.model.Teacher.find({ state: 3 }).count();
     if (!total) { return [ 404404, '暂无教师信息' ]; }
     const totals = Math.ceil(total / pageSize);
     if (page > totals) { return [ -2, '无效页码' ]; }
     if (page < 1) { page = 1; }
-    const result = await this.ctx.model.Teacher.find({}).populate({ path: 'User', select: { _id: 0, password: 0, id: 0 } }).skip((page - 1) * pageSize)
+    const result = await this.ctx.model.Teacher.find({ state: 3 }).skip((page - 1) * pageSize)
       .limit(pageSize);
     if (!Number(page)) {
       page = 1;
@@ -141,6 +141,36 @@ class TeacherService extends Service {
       page = Number(page);
     }
     return [ 0, '所有教师信息返回成功', result, totals, page, results[1], results[2] ];
+  }
+  // 搜索老师
+  async search(params, page) {
+    const { ctx, app } = this;
+    const results = jwt(app, ctx.request.header.authorization);
+    if (results[0]) { return [ -3, '请求失败' ]; }
+    const { pageSize } = this.config.paginatorConfig;
+    let total = null;
+    if (params.name === null) {
+      total = await this.ctx.model.Teacher.find({ state: 3 }).countDocuments();
+      if (!total) { return [ 404404, '暂无教师信息' ]; }
+    } else {
+      total = await this.ctx.model.Teacher.find({ goodAt: { $regex: params.name } , state: 3 }).countDocuments();
+      if (!total) { return [ 404404, '暂无教师信息' ]; }
+    }
+    const totals = Math.ceil(total / pageSize);
+    if (page > totals) { return [ -2, '无效页码' ]; }
+    if (page < 1) { page = 1; }
+    let result = null;
+    if (params.name === null) {
+      result = await this.ctx.model.Teacher.find({ state: 3 }).skip((page - 1) * pageSize).limit(pageSize);
+    } else {
+      result = await this.ctx.model.Teacher.find({ goodAt: { $regex: params.name } , state: 3 }).skip((page - 1) * pageSize).limit(pageSize);
+    }
+    if (!Number(page)) {
+      page = 1;
+    } else {
+      page = Number(page);
+    }
+    return [ 0, '符合条件的所有教师信息返回成功', result, totals, page, results[1], results[2] ];
   }
   // 所有教师信息列表
   async list(page) {
@@ -168,7 +198,8 @@ class TeacherService extends Service {
     const { ctx, app } = this;
     const results = jwt(app, ctx.request.header.authorization);
     if (results[0]) { return [ -3, '请求失败' ]; }
-    const result = await this.ctx.model.Teacher.find({}).sort({ totalSuccess: -1 }).limit(10);
+    const result = await this.ctx.model.Teacher.find({ state: 3 }).populate({ path: 'User', select: { _id: 0, password: 0, id: 0 } }).sort({ totalSuccess: -1 })
+      .limit(10);
     if (!result) { return [ 404404, '暂无教师信息' ]; }
     return [ 0, '所有教师信息返回成功', result, results[1], results[2] ];
   }

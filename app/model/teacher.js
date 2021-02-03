@@ -17,9 +17,9 @@ module.exports = app => {
     totalSuccess: { type: Number, default: 0 }, // 成功次数
     experience: { type: Number, default: 0 }, // 教学经验(年)
     age: { type: Number, default: 0 }, // 年龄
-    goodAt: { type: Array, default: null }, // 擅长科目
+    goodAt: { type: String, default: null }, // 擅长科目
     state: { type: Number, default: 1 }, // 审核状态 1已提交 2审核不通过 3审核通过
-    hourPrice: { type: Number }, // 课时费用
+    hourPrice: { type: Number, default: 0 }, // 课时费用
     school: { type: String, default: null }, // 在读/毕业院校
     city: { type: Array, default: null }, // 所在城市
     status: { type: Number, default: 1 }, // 状态 0禁用 1正常

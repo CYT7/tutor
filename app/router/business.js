@@ -28,6 +28,7 @@ module.exports = app => {
   router.post(`${teacherApi}/Information`, controller.business.teacher.informationofUser);
   router.post(`${teacherApi}/identityCard1`, controller.business.teacher.identityCard1);
   router.post(`${teacherApi}/identityCard2`, controller.business.teacher.identityCard2);
+  router.post(`${teacherApi}/search`, controller.business.teacher.search);
   router.get(`${teacherApi}/list`, controller.business.teacher.list);
   router.get(`${teacherApi}/recommendList`, controller.business.teacher.listOfRecommend);
 
