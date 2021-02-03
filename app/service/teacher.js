@@ -19,6 +19,8 @@ class TeacherService extends Service {
     if (results[0]) { return [ -1, '请求失败' ]; }
     const user = await ctx.model.User.findOne({ id: results[3] }).ne('status', 0);
     if (!user) { return [ -2, '不存在用户' ]; }
+    const result = await ctx.model.Teacher.findOne({ User: user });
+    if (result) { return [ -2, '你已经申请过当家教了' ]; }
     const teacher = await ctx.model.Teacher.aggregate().sort({ id: -1 });
     const newTeacher = new ctx.model.Teacher({
       User: user,
@@ -166,11 +168,9 @@ class TeacherService extends Service {
     const { ctx, app } = this;
     const results = jwt(app, ctx.request.header.authorization);
     if (results[0]) { return [ -3, '请求失败' ]; }
-    const total = await this.ctx.model.Teacher.find({}).count();
-    if (!total) { return [ 404404, '暂无教师信息' ]; }
-    const result = await this.ctx.model.Teacher.find({}).populate({ path: 'User', select: { _id: 0, password: 0, id: 0 } }).sort({ totalSuccess: -1 })
-      .limit(10);
-    return [ 0, '所有教师信息返回成功', result, total, results[1], results[2] ];
+    const result = await this.ctx.model.Teacher.find({}).sort({ totalSuccess: -1 }).limit(10);
+    if (!result) { return [ 404404, '暂无教师信息' ]; }
+    return [ 0, '所有教师信息返回成功', result, results[1], results[2] ];
   }
   // 上传身份证正面照
   async identityCard1(filename) {

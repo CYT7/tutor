@@ -5,7 +5,6 @@
  */
 'use strict';
 const Service = require('egg').Service;
-const md5 = require('js-md5');
 const jwt = require('../utils/jwt');
 class NeedService extends Service {
   // 创建需求
@@ -16,7 +15,7 @@ class NeedService extends Service {
     const user = await ctx.model.User.findOne({ id: results[3] }).ne('status', 0);
     if (!user) { return [ -2, '不存在用户' ]; }
     const need = await ctx.model.Need.create({
-      id: md5(Math.random().toString(36).substr(3, 5) + Date.now().toString(36)),
+      id: Date.now().toString(36)+Math.random().toString(36).substr(3, 5),
       User: user,
       nickName: params.nickName,
       phone: params.phone,
@@ -208,18 +207,15 @@ class NeedService extends Service {
     await this.ctx.model.Need.updateOne({ id: need.id }, obj);
     return [ 0, `${need.id} 需求信息修改成功，待审核`, results[1], results[2] ];
   }
-  // 所有需求信息
+  // 所有推荐需求信息
   async list() {
     const { ctx, app } = this;
     const results = jwt(app, ctx.request.header.authorization);
     if (results[0]) { return [ -1, '请求失败' ]; }
-    const user = await ctx.model.User.findOne({ id: results[3] }).ne('status', 0);
-    if (!user) { return [ -2, '用户不存在' ]; }
-    const total = await this.ctx.model.Need.find({ state: 3 }).ne('status', 0).count();
-    if (!total) { return [ 400607, '暂无需求信息' ]; }
     const NeedResult = await this.ctx.model.Need.find({ state: 3 }).ne('status', 0).sort({ createTime: -1 })
       .limit(10);
-    return [ 0, '所有需求信息返回成功', NeedResult, total, results[1], results[2] ];
+    if (!NeedResult) { return [ 400607, '暂无需求信息' ]; }
+    return [ 0, '所有需求信息返回成功', NeedResult, results[1], results[2] ];
   }
   // 所有需求信息
   async adminList(page, types) {

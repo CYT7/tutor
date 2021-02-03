@@ -69,7 +69,7 @@ class TeacherController extends Controller {
     const res = await ctx.service.teacher.listOfRecommend(ctx.request.query);
     if (res) {
       ctx.status = 201;
-      ctx.body = { code: res[0], msg: res[1], data: res[2], total: res[3], token: res[4], exp: res[5] };
+      ctx.body = { code: res[0], msg: res[1], data: res[2], token: res[3], exp: res[4] };
     } else {
       ctx.body = { code: res[0], msg: res[1] };
     }
