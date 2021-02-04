@@ -88,7 +88,7 @@ class TeacherController extends Controller {
     }
   }
   // 身份证正面照
-  async identityCard1() {
+  async identityCard() {
     const { ctx } = this;
     const parts = ctx.multipart({ autoFields: true });
     let files = {};
@@ -96,20 +96,20 @@ class TeacherController extends Controller {
     while ((stream = await parts()) != null) {
       if (!stream.filename) { break; }
       const fieldname = stream.fieldname; // file表单的名字
-      const dir = await this.service.teacher.identityCard1(stream.filename);// 上传图片的目录
+      const dir = await this.service.teacher.identityCard(stream.filename);// 上传图片的目录
       const target = dir.uploadDir;
       const writeStream = fs.createWriteStream(target);
       await pump(stream, writeStream);
       files = Object.assign(files, { [fieldname]: dir.saveDir });
     }
     if (Object.keys(files).length > 0) {
-      ctx.body = { code: 0, msg: '用户上传身份证成功', data: files };
+      ctx.body = { code: 0, msg: '用户上传身份证成功' };
     } else {
-      ctx.body = { code: 400404, msg: '用户上传身份证失败', data: {} };
+      ctx.body = { code: 400404, msg: '用户上传身份证失败' };
     }
   }
   // 身份证反面照
-  async identityCard2() {
+  async StudentCard() {
     const { ctx } = this;
     const parts = ctx.multipart({ autoFields: true });
     let files = {};
@@ -117,16 +117,16 @@ class TeacherController extends Controller {
     while ((stream = await parts()) != null) {
       if (!stream.filename) { break; }
       const fieldname = stream.fieldname; // file表单的名字
-      const dir = await this.service.teacher.identityCard2(stream.filename);// 上传图片的目录
+      const dir = await this.service.teacher.StudentCard(stream.filename);// 上传图片的目录
       const target = dir.uploadDir;
       const writeStream = fs.createWriteStream(target);
       await pump(stream, writeStream);
       files = Object.assign(files, { [fieldname]: dir.saveDir });
     }
     if (Object.keys(files).length > 0) {
-      ctx.body = { code: 0, msg: '用户上传身份证成功', data: files };
+      ctx.body = { code: 0, msg: '用户上传学生证成功' };
     } else {
-      ctx.body = { code: 400404, msg: '用户上传身份证失败', data: {} };
+      ctx.body = { code: 400404, msg: '用户上传学生证失败' };
     }
   }
 }

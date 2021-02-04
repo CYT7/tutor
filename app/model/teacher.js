@@ -12,8 +12,8 @@ module.exports = app => {
     id: { type: String, allowNull: false },
     User: { type: Schema.Types.ObjectId, ref: 'User' }, // 用户
     realName: { type: String, default: null }, // 真实姓名
-    identityCard1: { type: String, default: null }, // 身份证正面照
-    identityCard2: { type: String, default: null }, // 身份证反面照
+    identityCard: { type: String, default: null }, // 身份证
+    StudentCard: { type: String, default: null }, // 学生证
     totalSuccess: { type: Number, default: 0 }, // 成功次数
     experience: { type: Number, default: 0 }, // 教学经验(年)
     age: { type: Number, default: 0 }, // 年龄

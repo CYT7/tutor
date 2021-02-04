@@ -201,8 +201,8 @@ class TeacherService extends Service {
     if (!result) { return [ 404404, '暂无教师信息' ]; }
     return [ 0, '所有教师信息返回成功', result, results[1], results[2] ];
   }
-  // 上传身份证正面照
-  async identityCard1(filename) {
+  // 上传身份证
+  async identityCard(filename) {
     const { ctx, app } = this;
     const results = jwt(app, ctx.request.header.authorization);
     if (results[0]) { return [ -1, '请求失败' ]; }
@@ -219,8 +219,8 @@ class TeacherService extends Service {
     await this.ctx.model.Teacher.updateOne({ id: teacher.id }, { identityCard1: saveDir });
     return { uploadDir, saveDir };
   }
-  // 上传身份证反面照
-  async identityCard2(filename) {
+  // 上传学生证
+  async StudentCard(filename) {
     const { ctx, app } = this;
     const results = jwt(app, ctx.request.header.authorization);
     if (results[0]) { return [ -1, '请求失败' ]; }
@@ -234,7 +234,7 @@ class TeacherService extends Service {
     const date = Date.now();// 毫秒数
     const uploadDir = path.join(dir, date + path.extname(filename));
     const saveDir = this.ctx.origin + uploadDir.slice(3).replace(/\\/g, '/');
-    await this.ctx.model.Teacher.updateOne({ id: teacher.id }, { identityCard2: saveDir });
+    await this.ctx.model.Teacher.updateOne({ id: teacher.id }, { StudentCard: saveDir });
     return { uploadDir, saveDir };
   }
 }

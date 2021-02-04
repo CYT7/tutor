@@ -26,8 +26,8 @@ module.exports = app => {
   router.post(`${teacherApi}/information`, controller.business.teacher.information);
   router.put(`${teacherApi}/information`, controller.business.teacher.modify);
   router.post(`${teacherApi}/Information`, controller.business.teacher.informationofUser);
-  router.post(`${teacherApi}/identityCard1`, controller.business.teacher.identityCard1);
-  router.post(`${teacherApi}/identityCard2`, controller.business.teacher.identityCard2);
+  router.post(`${teacherApi}/identityCard`, controller.business.teacher.identityCard);
+  router.post(`${teacherApi}/StudentCard`, controller.business.teacher.StudentCard);
   router.post(`${teacherApi}/search`, controller.business.teacher.search);
   router.get(`${teacherApi}/list`, controller.business.teacher.list);
   router.get(`${teacherApi}/recommendList`, controller.business.teacher.listOfRecommend);
