@@ -108,7 +108,7 @@ class TeacherController extends Controller {
       ctx.body = { code: 400404, msg: '用户上传身份证失败' };
     }
   }
-  // 身份证反面照
+  // 学生证
   async StudentCard() {
     const { ctx } = this;
     const parts = ctx.multipart({ autoFields: true });
