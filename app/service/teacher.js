@@ -216,7 +216,7 @@ class TeacherService extends Service {
     const date = Date.now();// 毫秒数
     const uploadDir = path.join(dir, date + path.extname(filename));
     const saveDir = this.ctx.origin + uploadDir.slice(3).replace(/\\/g, '/');
-    await this.ctx.model.Teacher.updateOne({ id: teacher.id }, { identityCard1: saveDir });
+    await this.ctx.model.Teacher.updateOne({ id: teacher.id }, { identityCard: saveDir });
     return { uploadDir, saveDir };
   }
   // 上传学生证
@@ -235,7 +235,7 @@ class TeacherService extends Service {
     const uploadDir = path.join(dir, date + path.extname(filename));
     const saveDir = this.ctx.origin + uploadDir.slice(3).replace(/\\/g, '/');
     await this.ctx.model.Teacher.updateOne({ id: teacher.id }, { StudentCard: saveDir });
-    return { uploadDir, saveDir };
+    return { uploadDir, saveDir, res };
   }
 }
 module.exports = TeacherService;
