@@ -116,8 +116,6 @@ class TeacherService extends Service {
     const { ctx, app } = this;
     const results = jwt(app, ctx.request.header.authorization);
     if (results[0]) { return [ -1, '请求失败' ]; }
-    const user = await ctx.model.User.findOne({ id: results[3] }).ne('status', 0);
-    if (!user) { return [ -2, '不存在用户' ]; }
     const teacherResult = await ctx.model.Teacher.findOne({ id: params.id }).populate({ path: 'User', select: { _id: 0, password: 0, id: 0 } });
     if (!teacherResult) { return [ 400502, '尚无此老师信息' ]; }
     return [ 0, `${teacherResult.User.nickName}个人信息返回成功`, teacherResult, results[1], results[2] ];
