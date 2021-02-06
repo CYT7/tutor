@@ -34,7 +34,7 @@ module.exports = (options, app) => {
             ctx.body = { code: 401, msg: 'Token过期' };
             ctx.status = 201;
           }
-          const user = await ctx.model.User.findOne({ id: decode.name });
+          const user = await ctx.model.User.findOne({ _id: decode.name });
           if (user) {
             await next();
           } else {

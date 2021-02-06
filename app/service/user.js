@@ -1,7 +1,7 @@
 /**
  * @author: Chen yt7
  * @date: 2020/12/14 10:15 AM
-* @modifyDate：2020/12/20 4：00PM
+* @modifyDate：2020/02/06 11：00AM
  */
 'use strict';
 
@@ -16,8 +16,8 @@ class UserService extends Service {
   // 创建用户
   async create(params) {
     const { ctx } = this;
-    const checkUser = await ctx.model.User.findOne({ $or: [{ phone: params.phone }, { email: params.email }] }).ne('status', 0);
-    if (checkUser) { return [ 400400, '你已经用手机或邮箱创建过啦，请前往登录亲' ]; }
+    const checkUser = await ctx.model.User.findOne({ $or: [{ phone: params.phone }, { email: params.email }] });
+    if (checkUser) { return [ 400400, '你已经用手机或邮箱创建过了，请前往登录亲' ]; }
     const user = await ctx.model.User.aggregate().sort({ id: -1 });
     const newUser = new ctx.model.User({
       createTime: Math.round(new Date() / 1000),
@@ -29,30 +29,29 @@ class UserService extends Service {
     });
     newUser.nickName = params.nickName;
     if (!params.nickName) {
-      const round = Math.round(new Date() / 1000) + Math.random().toString(36).substr(3, 5);
+      const round = Math.round(new Date() / 1000);
       newUser.nickName = '用户' + round;
     }
     if (!user.length) {
       newUser.id = new Date().getFullYear().toString()
-        .substr(0, 4) + '1';
+        .substr(0, 4) + '01';
       newUser.save();
       return [ 0, '用户创建成功，你可以进行登录了' ];
     }
     newUser.id = user[0].id + 1;
     newUser.save();
-    ctx.status = 201;
     return [ 0, '用户创建成功，你可以进行登录了' ];
   }
   // 用户登录
   async login(params) {
     const { ctx, app } = this;
     const user = await ctx.model.User.findOne({ $or: [{ phone: params.username }, { email: params.username }] }).ne('status', 0);
-    if (!user) { return [ 400401, '请输入正确的账号或者前往创建账号' ]; }
+    if (!user) { return [ 400401, '查无此账号' ]; }
     const pwd = md5(params.password);
     if (pwd !== user.password) { return [ 404401, '登录失败，密码错误' ]; }
     const exp = Math.round(new Date() / 1000) + (60 * 60 * 3);
     const token = app.jwt.sign({
-      name: user.id,
+      name: user._id,
       iat: Math.round(new Date() / 1000),
       exp,
     }, app.config.jwt.secret);
@@ -65,19 +64,19 @@ class UserService extends Service {
     const { ctx, app } = this;
     const results = jwt(app, ctx.request.header.authorization);
     if (results[0]) { return [ -1, '请求失败' ]; }
-    if (!results[3]) { return [ -3, '参数异常' ]; }
-    const userInfo = await ctx.model.User.findOne({ id: results[3] }, { _id: 0, password: 0 }).ne('status', 0);
+    if (!results[3]) { return [ -2, '非法用户' ]; }
+    const userInfo = await ctx.model.User.findOne({ _id: results[3] }, { _id: 0, password: 0 }).ne('status', 0);
     if (!userInfo) { return [ 400402, '暂无用户个人信息' ]; }
     return [ 0, `${userInfo.nickName}的个人信息返回成功`, userInfo, results[1], results[2] ];
   }
-  // 用户所有信息
+  // 管理员查看用户所有信息
   async list(page) {
     const { ctx, app } = this;
     const results = jwt(app, ctx.request.header.authorization);
-    if (results[0]) { return [ -3, '请求失败' ]; }
+    if (results[0]) { return [ -1, '请求失败' ]; }
     const { pageSize } = this.config.paginatorConfig;
-    const total = await this.ctx.model.User.find({}).ne('status', 0).count();
-    if (!total) { return [ 404401, '暂无用户信息' ]; }
+    const total = await this.ctx.model.User.find({}).ne('status', 0).countDocuments();
+    if (!total) { return [ 404201, '暂无用户信息' ]; }
     const totals = Math.ceil(total / pageSize);
     if (page > totals) { return [ -2, '无效页码' ]; }
     if (page < 1) { page = 1; }
@@ -88,14 +87,14 @@ class UserService extends Service {
     } else {
       page = Number(page);
     }
-    return [ 0, '所有用户信息返回成功', userResult, totals, page ];
+    return [ 0, '所有用户信息返回成功', userResult, totals, page, results[1], results[2] ];
   }
   // 修改用户个人信息
   async modify(params) {
     const { ctx, app } = this;
     const results = jwt(app, ctx.request.header.authorization);
     if (results[0]) { return [ -1, '请求失败' ]; }
-    const user = await ctx.model.User.findOne({ id: results[3] }).ne('status', 0);
+    const user = await ctx.model.User.findOne({ _id: results[3] }).ne('status', 0);
     if (!user) { return [ -2, '不存在用户' ]; }
     if (params.oldPassword) {
       const oldPwd = md5(params.oldPassword);
@@ -120,7 +119,7 @@ class UserService extends Service {
       obj[k] = v;
     }
     obj.updateTime = Math.round(new Date() / 1000);
-    await this.ctx.model.User.updateOne({ id: results[3] }, obj);
+    await this.ctx.model.User.updateOne({ _id: results[3] }, obj);
     ctx.status = 201;
     return [ 0, '用户个人信息修改成功', results[1], results[2] ];
   }
@@ -133,7 +132,7 @@ class UserService extends Service {
     const { ctx, app } = this;
     const results = jwt(app, ctx.request.header.authorization);
     if (results[0]) { return [ -1, '请求失败' ]; }
-    const user = await ctx.model.User.findOne({ id: results[3] }).ne('status', 0);
+    const user = await ctx.model.User.findOne({ _id: results[3] }).ne('status', 0);
     if (!user) { return [ -2, '用户不存在' ]; }
     const day = sd.format(new Date(), 'YYYYMMDD');// 获取当前日期
     const dir = path.join(this.config.uploadDir, day);// 创建图片保存的路径
@@ -141,7 +140,7 @@ class UserService extends Service {
     const date = Date.now();// 毫秒数
     const uploadDir = path.join(dir, date + path.extname(filename));
     const saveDir = this.ctx.origin + uploadDir.slice(3).replace(/\\/g, '/');
-    await this.ctx.model.User.updateOne({ id: results[3] }, { image_url: saveDir });
+    await this.ctx.model.User.updateOne({ _id: results[3] }, { image_url: saveDir });
     return { uploadDir, saveDir };
   }
   // 增加余额
@@ -149,14 +148,14 @@ class UserService extends Service {
     const { ctx, app } = this;
     const results = jwt(app, ctx.request.header.authorization);
     if (results[0]) { return [ -1, '请求失败' ]; }
-    const user = await ctx.model.User.findOne({ id: results[3] }).ne('status', 0);
-    if (!user) { return [ -2, '用户不存在' ]; }
+    const user = await ctx.model.User.findOne({ _id: results[3] }).ne('status', 0);
+    if (!user) { return [ -2, '非法用户' ]; }
     if (param.balance) {
       user.balance += param.balance;
       user.save();
-      return [ 0, `余额：+${param.balance}元`, results[1], results[2] ];
+      return [ 0, `余额增加${param.balance / 100}元`, results[1], results[2] ];
     }
-    return [ -1, '增加失败，请增加固定金额' ];
+    return [ 400405, '增加失败，请增加固定金额' ];
   }
 }
 module.exports = UserService;

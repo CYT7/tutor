@@ -24,11 +24,11 @@ module.exports = app => {
   const teacherApi = '/business/teacher';
   router.post(`${teacherApi}/create`, controller.business.teacher.create);
   router.post(`${teacherApi}/information`, controller.business.teacher.information);
-  router.put(`${teacherApi}/information`, controller.business.teacher.modify);
   router.post(`${teacherApi}/Information`, controller.business.teacher.informationofUser);
   router.post(`${teacherApi}/identityCard`, controller.business.teacher.identityCard);
   router.post(`${teacherApi}/StudentCard`, controller.business.teacher.StudentCard);
   router.post(`${teacherApi}/search`, controller.business.teacher.search);
+  router.put(`${teacherApi}/information`, controller.business.teacher.modify);
   router.get(`${teacherApi}/list`, controller.business.teacher.list);
   router.get(`${teacherApi}/recommendList`, controller.business.teacher.listOfRecommend);
 
@@ -65,7 +65,9 @@ module.exports = app => {
   router.post(`${appointApi}/teacherClose`, controller.business.appoint.teacherClose);
   router.get(`${appointApi}/userList`, controller.business.appoint.userList);
   router.get(`${appointApi}/teacherList`, controller.business.appoint.teacherList);
-
+  /**
+   * 分类相关接口
+   **/
   const categoryApi = '/business/category';
   router.get(`${categoryApi}/List`, controller.business.category.listOfUser);
 

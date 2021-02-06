@@ -21,7 +21,6 @@ module.exports = app => {
   router.get(`${adminApi}/index`, controller.admin.admin.index);
   router.delete(`${adminApi}/delete`, controller.admin.admin.delete);
 
-
   /**
    * 分类相关接口
    */
