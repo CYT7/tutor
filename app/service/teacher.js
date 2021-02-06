@@ -66,7 +66,7 @@ class TeacherService extends Service {
     if (!user) { return [ -2, '不存在用户' ]; }
     const teacher = await ctx.model.Teacher.findOne({ User: user });
     if (!teacher) { return [ 400503, '你尚未申请做家教，请前往申请' ]; }
-    const checkParams = [ 'experience', 'age', 'goodAt', 'hourPrice', 'city' ];
+    const checkParams = [ 'experience', 'age', 'goodAt', 'hourPrice', 'city','realName','school' ];
     const newData = new Map();
     const paramsMap = new Map(Object.entries(params));
     const newTeacher = new Map(Object.entries(teacher.toObject()));
@@ -235,7 +235,7 @@ class TeacherService extends Service {
     const uploadDir = path.join(dir, date + path.extname(filename));
     const saveDir = this.ctx.origin + uploadDir.slice(3).replace(/\\/g, '/');
     await this.ctx.model.Teacher.updateOne({ id: teacher.id }, { StudentCard: saveDir });
-    return { uploadDir, saveDir, res };
+    return { uploadDir, saveDir };
   }
 }
 module.exports = TeacherService;

@@ -124,7 +124,7 @@ class TeacherController extends Controller {
       files = Object.assign(files, { [fieldname]: dir });
     }
     if (Object.keys(files).length > 0) {
-      ctx.body = { code: 0, msg: '用户上传学生证成功'};
+      ctx.body = { code: 0, msg: '用户上传学生证成功' };
     } else {
       ctx.body = { code: 400404, msg: '用户上传学生证失败' };
     }
