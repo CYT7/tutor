@@ -190,7 +190,7 @@ class AppointService extends Service {
     const user = await ctx.model.User.findOne({ _id: results[3] }).ne('status', 0);
     if (!user) { return [ -2, '不存在用户' ]; }
     const { pageSize } = this.config.paginatorConfig;
-    const total = await this.ctx.model.Appoint.find({ student: user }).ne('status', 0).count();
+    const total = await this.ctx.model.Appoint.find({ student: user }).ne('status', 0).countDocuments();
     if (!total) { return [ 400708, '暂无需求信息' ]; }
     const totals = Math.ceil(total / pageSize);
     if (page > totals) { return [ -2, '无效页码' ]; }
@@ -213,7 +213,7 @@ class AppointService extends Service {
     const teacher = await ctx.model.Teacher.findOne({ User: results[3] }).ne('status', 0);
     if (!teacher) { return [ -2, '你不是老师' ]; }
     const { pageSize } = this.config.paginatorConfig;
-    const total = await this.ctx.model.Appoint.find({ teacher }).ne('status', 0).count();
+    const total = await this.ctx.model.Appoint.find({ teacher }).ne('status', 0).countDocuments();
     if (!total) { return [ 400708, '暂无预约信息' ]; }
     const totals = Math.ceil(total / pageSize);
     if (page > totals) { return [ -2, '无效页码' ]; }
@@ -246,10 +246,10 @@ class AppointService extends Service {
     }
     let total = null;
     if (types) {
-      total = await this.ctx.model.Appoint.find({ state: { $in: typesResults } }).ne('status', 0).count();
+      total = await this.ctx.model.Appoint.find({ state: { $in: typesResults } }).ne('status', 0).countDocuments();
       if (!total) { return [ 404401, '暂无预约信息' ]; }
     } else {
-      total = await this.ctx.model.Appoint.find({}).ne('status', 0).count();
+      total = await this.ctx.model.Appoint.find({}).ne('status', 0).countDocuments();
       if (!total) { return [ 404401, '暂无预约信息' ]; }
     }
     const totals = Math.ceil(total / pageSize);

@@ -98,7 +98,7 @@ class TeacherService extends Service {
     const results = jwt(app, ctx.request.header.authorization);
     if (results[0]) { return [ -1, '请求失败' ]; }
     const { pageSize } = this.config.paginatorConfig;
-    const total = await this.ctx.model.Teacher.find({ state: 3 }).count();
+    const total = await this.ctx.model.Teacher.find({ state: 3 }).countDocuments();
     if (!total) { return [ 404504, '暂无教师信息' ]; }
     const totals = Math.ceil(total / pageSize);
     if (page > totals) { return [ -2, '无效页码' ]; }
@@ -212,7 +212,7 @@ class TeacherService extends Service {
     const results = jwt(app, ctx.request.header.authorization);
     if (results[0]) { return [ -3, '请求失败' ]; }
     const { pageSize } = this.config.paginatorConfig;
-    const total = await this.ctx.model.Teacher.find({}).count();
+    const total = await this.ctx.model.Teacher.find({}).countDocuments();
     if (!total) { return [ 404404, '暂无教师信息' ]; }
     const totals = Math.ceil(total / pageSize);
     if (page > totals) { return [ -2, '无效页码' ]; }

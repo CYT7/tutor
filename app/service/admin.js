@@ -149,11 +149,11 @@ class AdminService extends Service {
     const { ctx, app } = this;
     const results = jwt(app, ctx.request.header.authorization);
     if (results[0]) { return [ -3, '请求失败' ]; }
-    const adminCount = await ctx.model.Admin.find({ deleted: 1 }).count();
-    const userCount = await ctx.model.User.find({ status: 1 }).count();
-    const teacherCount = await ctx.model.Teacher.find({ status: 1 }).count();
-    const appointCount = await ctx.model.Appoint.find({}).count();
-    const needCount = await ctx.model.Need.find({}).count();
+    const adminCount = await ctx.model.Admin.find({ deleted: 1 }).countDocuments();
+    const userCount = await ctx.model.User.find({ status: 1 }).countDocuments();
+    const teacherCount = await ctx.model.Teacher.find({ status: 1 }).countDocuments();
+    const appointCount = await ctx.model.Appoint.find({}).countDocuments();
+    const needCount = await ctx.model.Need.find({}).countDocuments();
     const resultMap = {};
     resultMap.adminCount = adminCount;
     resultMap.userCount = userCount;

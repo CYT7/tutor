@@ -173,7 +173,7 @@ class NeedService extends Service {
     const user = await ctx.model.User.findOne({ _id: results[3] }).ne('status', 0);
     if (!user) { return [ -2, '非法用户' ]; }
     const { pageSize } = this.config.paginatorConfig;
-    const total = await this.ctx.model.Need.find({ User: user }).ne('status', 0).count();
+    const total = await this.ctx.model.Need.find({ User: user }).ne('status', 0).countDocuments();
     if (!total) { return [ 400608, '暂无需求信息' ]; }
     const totals = Math.ceil(total / pageSize);
     if (page > totals) { return [ -2, '无效页码' ]; }
@@ -194,7 +194,7 @@ class NeedService extends Service {
     const results = jwt(app, ctx.request.header.authorization);
     if (results[0]) { return [ -1, '请求失败' ]; }
     const { pageSize } = this.config.paginatorConfig;
-    const total = await this.ctx.model.Need.find({ state: 3 }).ne('status', 0).count();
+    const total = await this.ctx.model.Need.find({ state: 3 }).ne('status', 0).countDocuments();
     if (!total) { return [ 400608, '暂无需求信息' ]; }
     const totals = Math.ceil(total / pageSize);
     if (page > totals) { return [ -2, '无效页码' ]; }
@@ -271,7 +271,7 @@ class NeedService extends Service {
     const Teacher = await ctx.model.Teacher.findOne({ User: results[3] });
     if (!Teacher) { return [ -2, '你尚未申请做家教，请前往申请' ]; }
     const { pageSize } = this.config.paginatorConfig;
-    const total = await this.ctx.model.Need.find({ teacher: Teacher }).ne('status', 0).count();
+    const total = await this.ctx.model.Need.find({ teacher: Teacher }).ne('status', 0).countDocuments();
     if (!total) { return [ 400607, '暂无需求信息' ]; }
     const totals = Math.ceil(total / pageSize);
     if (page > totals) { return [ -2, '无效页码' ]; }
@@ -328,10 +328,10 @@ class NeedService extends Service {
     }
     let total = null;
     if (types) {
-      total = await this.ctx.model.Need.find({ state: { $in: typesResults } }).count();
+      total = await this.ctx.model.Need.find({ state: { $in: typesResults } }).countDocuments();
       if (!total) { return [ 404403, '暂无需求信息' ]; }
     } else {
-      total = await this.ctx.model.Need.find({}).count();
+      total = await this.ctx.model.Need.find({}).countDocuments();
       if (!total) { return [ 404403, '暂无需求信息' ]; }
     }
     const totals = Math.ceil(total / pageSize);
