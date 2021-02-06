@@ -28,17 +28,6 @@ class NeedController extends Controller {
       ctx.body = { code: res[0], msg: res[1] };
     }
   }
-  // 修改需求（审核不通过）
-  async modify() {
-    const { ctx } = this;
-    const res = await ctx.service.need.modify(ctx.request.body);
-    if (res) {
-      ctx.status = 201;
-      ctx.body = { code: res[0], msg: res[1], token: res[2], exp: res[3] };
-    } else {
-      ctx.body = { code: res[0], msg: res[1] };
-    }
-  }
   // 关闭需求
   async userClose() {
     const { ctx } = this;

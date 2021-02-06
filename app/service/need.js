@@ -125,36 +125,6 @@ class NeedService extends Service {
     }
     return [ 400606, '需求关闭异常，请稍后再试' ];
   }
-  // 修改需求（审核不通过）
-  async modify(params) {
-    const { ctx, app } = this;
-    const results = jwt(app, ctx.request.header.authorization);
-    if (results[0]) { return [ -1, '请求失败' ]; }
-    const user = await ctx.model.User.findOne({ id: results[3] }).ne('status', 0);
-    if (!user) { return [ -2, '用户不存在' ]; }
-    const need = await ctx.model.Need.findOne({ id: params.id, state: 2 });
-    if (!need) { return [ 400607, '查无此需求' ]; }
-    const checkParams = [ 'nickName', 'phone', 'wechat', 'qq', 'gender', 'teacherGender', 'city', 'address', 'subject', 'teach_date', 'frequency', 'timeHour', 'hourPrice', 'totalPrice' ];
-    const newData = new Map();
-    const paramsMap = new Map(Object.entries(params));
-    const newNeed = new Map(Object.entries(need.toObject()));
-    for (const k of paramsMap.keys()) {
-      if (params[k] !== newNeed.get(k)) {
-        if (!checkParams.includes(k)) { continue; }
-        if (!params[k]) { continue; }
-        newData.set(k, params[k]);
-      }
-    }
-    if (!newData.size) { return [ 400607, '没有进行任何修改' ]; }
-    const obj = Object.create(null);
-    for (const [ k, v ] of newData) {
-      obj[k] = v;
-    }
-    obj.updateTime = Math.round(new Date() / 1000);
-    obj.state = 1;
-    await this.ctx.model.Need.updateOne({ id: need.id }, obj);
-    return [ 0, `${need.id} 需求信息修改成功，待审核`, results[1], results[2] ];
-  }
   // 用户查看所有推荐需求信息
   async list() {
     const { ctx, app } = this;
