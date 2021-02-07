@@ -92,6 +92,7 @@ class AppointService extends Service {
     const teacher = await ctx.model.Teacher.findOne({ _id: result.teacher }).populate({ path: 'User', select: 'balance' });
     teacher.User.balance = teacher.User.balance + result.totalPrice;
     teacher.User.save();
+    teacher.totalSuccess = teacher.totalSuccess + 1;
     teacher.totalComment = teacher.totalComment + 1;
     teacher.satisfaction = (params.rate * 100 + teacher.satisfaction) / teacher.totalComment;
     teacher.save();

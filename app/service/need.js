@@ -89,8 +89,9 @@ class NeedService extends Service {
     need.rate = params.rate;
     need.save();
     const teacher = await ctx.model.Teacher.findOne({ _id: need.teacher }).populate({ path: 'User', select: 'balance' });
-    teacher.User.balance += needPrice;
-    teacher.User.save()
+    teacher.User.balance = teacher.User.balance + needPrice;
+    teacher.User.save();
+    teacher.totalSuccess = teacher.totalSuccess + 1;
     teacher.totalComment = teacher.totalComment + 1;
     teacher.satisfaction = (params.rate * 100 + teacher.satisfaction) / teacher.totalComment;
     teacher.save();
