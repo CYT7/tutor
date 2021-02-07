@@ -15,6 +15,8 @@ module.exports = app => {
     identityCard: { type: String, default: null }, // 身份证
     StudentCard: { type: String, default: null }, // 学生证
     totalSuccess: { type: Number, default: 0 }, // 成功次数
+    totalComment: { type: Number, default: 0 }, // 被评论次数
+    satisfaction: { type: Number, default: 0 }, // 满意度
     experience: { type: Number, default: 0 }, // 教学经验(年)
     age: { type: Number, default: 0 }, // 年龄
     goodAt: { type: String, default: null }, // 擅长科目

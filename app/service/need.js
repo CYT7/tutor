@@ -81,12 +81,18 @@ class NeedService extends Service {
     if (!user) { return [ -2, '非法用户' ]; }
     const need = await ctx.model.Need.findOne({ id: params.id, state: 4 }).ne('status', 0);
     if (!need) { return [ 400605, '查无此需求' ]; }
-    const appointPrice = need.totalPrice;
-    if (user.balance < appointPrice) { return [ 400605, '余额不足，需求无法完成，请充值' ]; }
-    user.balance -= appointPrice;
+    const needPrice = need.totalPrice;
+    if (user.balance < needPrice) { return [ 400605, '余额不足，需求无法完成，请充值' ]; }
+    user.balance -= needPrice;
     user.save();
+    need.content = params.content;
+    need.rate = params.rate;
+    need.save();
     const teacher = await ctx.model.Teacher.findOne({ _id: need.teacher }).populate({ path: 'User', select: 'balance' });
-    teacher.User.balance += appointPrice;
+    teacher.User.balance += needPrice;
+    teacher.User.save()
+    teacher.totalComment = teacher.totalComment + 1;
+    teacher.satisfaction = (params.rate * 100 + teacher.satisfaction) / teacher.totalComment;
     teacher.save();
     await this.ctx.model.Need.updateOne({ id: need.id }, { state: 5, updateTime: Math.round(new Date() / 1000) });
     return [ 0, '此需求完成了', results[1], results[2] ];

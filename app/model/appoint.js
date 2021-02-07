@@ -26,7 +26,8 @@ module.exports = app => {
     city: { type: Array, default: null }, // 城市
     address: { type: String, default: null }, // 详情地址
     subject: { type: String, default: null }, // 科目
-    sort: { type: Number, default: 0 }, // 排序
+    content: { type: String, default: null }, // 评论
+    rate: { type: Number, default: 3 }, // 评分
     createTime: { type: Number, default: null }, // 创建时间
     updateTime: { type: Number, default: null }, // 更新时间
 

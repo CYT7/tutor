@@ -77,16 +77,23 @@ class AppointService extends Service {
     await this.ctx.model.Appoint.updateOne({ id: params.id }, { state: 2, updateTime: Math.round(new Date() / 1000) });
     return [ 0, '预约付款成功', results[1], results[2] ];
   }
-  // 老师完成预约
+  // 完成预约
   async finish(params) {
     const { ctx, app } = this;
     const results = jwt(app, ctx.request.header.authorization);
     if (results[0]) { return [ -1, '请求失败' ]; }
-    const teacher = await ctx.model.Teacher.findOne({ User: results[3] }).populate({ path: 'User', select: 'balance' }).ne('status', 0);
-    if (!teacher) { return [ -2, '你不是老师' ]; }
-    const result = await ctx.model.Appoint.findOne({ teacher, id: params.id, state: 2 }).ne('status', 0);
+    const user = await ctx.model.User.findOne({ _id: results[3] }).ne('status', 0);
+    if (!user) { return [ -2, '不存在用户' ]; }
+    const result = await ctx.model.Appoint.findOne({ student: user, id: params.id, state: 2 }).ne('status', 0);
     if (!result) { return [ 400705, '查无此预约信息' ]; }
-    teacher.User.balance += result.totalPrice;
+    result.content = params.content;
+    result.rate = params.rate;
+    result.save();
+    const teacher = await ctx.model.Teacher.findOne({ _id: result.teacher }).populate({ path: 'User', select: 'balance' });
+    teacher.User.balance = teacher.User.balance + result.totalPrice;
+    teacher.User.save();
+    teacher.totalComment = teacher.totalComment + 1;
+    teacher.satisfaction = (params.rate * 100 + teacher.satisfaction) / teacher.totalComment;
     teacher.save();
     await this.ctx.model.Appoint.updateOne({ id: params.id }, { state: 3, updateTime: Math.round(new Date() / 1000) });
     return [ 0, '预约完成了', results[1], results[2] ];
@@ -178,7 +185,7 @@ class AppointService extends Service {
     if (results[0]) { return [ -1, '请求失败' ]; }
     const user = await ctx.model.User.findOne({ _id: results[3] }).ne('status', 0);
     if (!user) { return [ -2, '不存在用户' ]; }
-    const result = await ctx.model.Appoint.findOne({ student: user, id: params.id }).populate({ path: 'teacher', select: { _id: 0 } }).ne('status', 0);
+    const result = await ctx.model.Appoint.findOne({ student: user, id: params.id }).populate({ path: 'teacher', select: { _id: 0 } });
     if (!result) { return [ 400707, '查无此预约信息' ]; }
     return [ 0, '预约信息返回成功', result, results[1], results[2] ];
   }
