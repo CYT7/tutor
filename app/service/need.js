@@ -83,7 +83,7 @@ class NeedService extends Service {
     if (!need) { return [ 400605, '查无此需求' ]; }
     const needPrice = need.totalPrice;
     if (user.balance < needPrice) { return [ 400605, '余额不足，需求无法完成，请充值' ]; }
-    user.balance -= needPrice;
+    console.log(user.balance);
     user.save();
     need.content = params.content;
     need.rate = params.rate;
@@ -93,7 +93,11 @@ class NeedService extends Service {
     teacher.User.save();
     teacher.totalSuccess = teacher.totalSuccess + 1;
     teacher.totalComment = teacher.totalComment + 1;
-    teacher.satisfaction = (params.rate * 100 + teacher.satisfaction) / teacher.totalComment;
+    if (teacher.totalComment === 1) {
+      teacher.satisfaction = (Number(params.rate) + Number(teacher.satisfaction)) / teacher.totalComment;
+    } else {
+      teacher.satisfaction = (Number(params.rate) + Number(teacher.satisfaction)) / 2;
+    }
     teacher.save();
     await this.ctx.model.Need.updateOne({ id: need.id }, { state: 5, updateTime: Math.round(new Date() / 1000) });
     return [ 0, '此需求完成了', results[1], results[2] ];
@@ -226,7 +230,7 @@ class NeedService extends Service {
     if (!teacher) { return [ 400601, 'sorry，你暂无执教资格，请前往申请' ]; }
     const need = await ctx.model.Need.findOne({ id: params.id, state: 3 }).ne('status', 0);
     if (!need) { return [ 400601, 'sorry,查无此需求' ]; }
-    const find = await ctx.model.Application.findOne({ Teacher: teacher });
+    const find = await ctx.model.Application.findOne({ Need: need, Teacher: teacher });
     if (find) { return [ 400601, '你已经应聘了' ]; }
     const newApplication = new ctx.model.Application({
       Need: need,
@@ -286,6 +290,38 @@ class NeedService extends Service {
     if (!need) { return [ 404402, '查无此需求' ]; }
     await this.ctx.model.Need.updateOne({ id: need.id }, { state: 2 });
     return [ 0, '此需求审核不通过', results[1], results[2] ];
+  }
+  // 修改需求(审核不通过)
+  async modify(params) {
+    const { ctx, app } = this;
+    const results = jwt(app, ctx.request.header.authorization);
+    if (results[0]) { return [ -1, '请求失败' ]; }
+    const user = await ctx.model.User.findOne({ _id: results[3] }).ne('status', 0);
+    if (!user) { return [ -2, '不存在用户' ]; }
+    const need = await ctx.model.Need.findOne({ id: params.id, state: 2 });
+    if (!need) { return [ 400607, '查无此需求' ]; }
+    const checkParams = [ 'nickName', 'phone', 'qq', 'wechat', 'gender', 'teacherGender', 'city', 'address', 'subject', 'frequency', 'timeHour', 'hourPrice' ];
+    const newData = new Map();
+    const paramsMap = new Map(Object.entries(params));
+    const newUser = new Map(Object.entries(need.toObject()));
+    for (const k of paramsMap.keys()) {
+      if (params[k] !== newUser.get(k)) {
+        if (!checkParams.includes(k)) { continue; }
+        if (!params[k]) { continue; }
+        newData.set(k, params[k]);
+      }
+    }
+    if (!newData.size) { return [ 400607, '没有进行任何修改' ]; }
+    const obj = Object.create(null);
+    for (const [ k, v ] of newData) {
+      obj[k] = v;
+    }
+    obj.teach_date = params.teach_date.join(',')
+    obj.updateTime = Math.round(new Date() / 1000);
+    obj.totalPrice = params.frequency * params.timeHour * params.hourPrice;
+    obj.state = 1;
+    await this.ctx.model.Need.updateOne({ id: need.id }, obj);
+    return [ 0, '需求信息修改成功', results[1], results[2] ];
   }
   // 所有需求信息
   async adminList(page, types) {

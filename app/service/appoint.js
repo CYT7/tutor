@@ -94,7 +94,11 @@ class AppointService extends Service {
     teacher.User.save();
     teacher.totalSuccess = teacher.totalSuccess + 1;
     teacher.totalComment = teacher.totalComment + 1;
-    teacher.satisfaction = (params.rate * 100 + teacher.satisfaction) / teacher.totalComment;
+    if (teacher.totalComment === 1) {
+      teacher.satisfaction = (Number(params.rate) + Number(teacher.satisfaction)) / teacher.totalComment;
+    } else {
+      teacher.satisfaction = (Number(params.rate) + Number(teacher.satisfaction)) / 2;
+    }
     teacher.save();
     await this.ctx.model.Appoint.updateOne({ id: params.id }, { state: 3, updateTime: Math.round(new Date() / 1000) });
     return [ 0, '预约完成了', results[1], results[2] ];

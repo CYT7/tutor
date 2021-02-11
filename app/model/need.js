@@ -17,8 +17,8 @@ module.exports = app => {
     phone: { type: String, default: null }, // 联系电话，家教中标才展示,详情页面不展示(必选)
     wechat: { type: String, default: null }, // 微信号，教员中标后才展示,详情页面不展示(可选)
     qq: { type: String, default: null }, // QQ 教员中标后才展示,详情页面不展示(可选)
-    gender: { type: Number, default: 0 }, // 性别 1男2女，详情页展示(必选)
-    teacherGender: { type: Number, default: 0 }, // 教师性别要求 0不限1男2女 搜索条件(必选)
+    gender: { type: Number, default: 1 }, // 性别 1保密 2男 3女 详情页展示(必选)
+    teacherGender: { type: Number, default: 1 }, // 性别 1保密 2男 3女 搜索条件(必选)
     city: { type: Array, default: null }, // 城市
     address: { type: String, default: null }, // 详情地址
     teach_date: { type: String, default: null }, // 上课时间

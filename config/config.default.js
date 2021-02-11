@@ -65,7 +65,7 @@ module.exports = appInfo => {
     ignore: [ '/business', '/admin/login', '/public' ],
   };
   config.userAuth = {
-    enable: true,
+    enable: false,
     ignore: [ '/admin', '/business/user/login', '/business/user/create', '/public' ],
   };
   return {

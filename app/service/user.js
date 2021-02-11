@@ -151,7 +151,7 @@ class UserService extends Service {
     const user = await ctx.model.User.findOne({ _id: results[3] }).ne('status', 0);
     if (!user) { return [ -2, '非法用户' ]; }
     if (param.balance) {
-      user.balance += param.balance;
+      user.balance = Number(user.balance) + Number(param.balance);
       user.save();
       return [ 0, `余额增加${param.balance / 100}元`, results[1], results[2] ];
     }
