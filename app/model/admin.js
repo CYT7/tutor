@@ -8,7 +8,7 @@ module.exports = app => {
   const mongoose = app.mongoose;
   const Schema = mongoose.Schema;
   const AdminSchema = new Schema({
-    id: { type: Number, allowNull: false }, // 管理员编号
+    id: { type: Number, allowNull: false }, // 管理员id
     name: { type: String, allowNull: false }, // 管理员登陆名
     realName: { type: String, default: null }, // 管理员真实姓名
     password: { type: String, allowNull: false }, // 管理员登陆密码

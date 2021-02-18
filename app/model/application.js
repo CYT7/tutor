@@ -11,6 +11,7 @@ module.exports = app => {
     Need: { type: Schema.Types.ObjectId, ref: 'Need' }, // 用户
     Teacher: { type: Schema.Types.ObjectId, ref: 'Teacher' }, // 老师id
     createTime: { type: Number, default: null }, // 创建时间
+    updateTime: { type: Number, default: null }, // 更新时间
   });
 
   return mongoose.model('Application', ApplicationSchema);

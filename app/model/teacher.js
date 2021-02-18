@@ -24,7 +24,6 @@ module.exports = app => {
     hourPrice: { type: Number, default: 0 }, // 课时费用
     school: { type: String, default: null }, // 在读/毕业院校
     city: { type: Array, default: null }, // 所在城市
-    status: { type: Number, default: 1 }, // 状态 0禁用 1正常
     createTime: { type: Number, default: null }, // 创建时间
     updateTime: { type: Number, default: null }, // 更新时间
   });

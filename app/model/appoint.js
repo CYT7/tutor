@@ -9,11 +9,10 @@ module.exports = app => {
   const Schema = mongoose.Schema;
 
   const AppointSchema = new Schema({
-    id: { type: String },
+    id: { type: String, allowNull: false }, // 预约id
     student: { type: Schema.Types.ObjectId, ref: 'User' }, // 家长id
     teacher: { type: Schema.Types.ObjectId, ref: 'Teacher' }, // 老师id
     state: { type: Number, default: 0 }, // 状态 0未预约 1已预约 2进行中 3已完成 4已关闭
-    status: { type: Number, default: 1 }, // 状态 0禁用 1启用
     frequency: { type: Number, default: 0 }, // 总共几次
     timeHour: { type: Number, default: 0 }, // 每次几小时
     teach_date: { type: String, default: null }, // 上课时间
@@ -30,7 +29,6 @@ module.exports = app => {
     rate: { type: Number, default: 3 }, // 评分
     createTime: { type: Number, default: null }, // 创建时间
     updateTime: { type: Number, default: null }, // 更新时间
-
   });
 
   return mongoose.model('Appoint', AppointSchema);
