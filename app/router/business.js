@@ -70,5 +70,10 @@ module.exports = app => {
    **/
   const categoryApi = '/business/category';
   router.get(`${categoryApi}/List`, controller.business.category.listOfUser);
+  /**
+   * 预约相关接口
+   */
+  const bannerApi = '/business/banner';
+  router.get(`${bannerApi}/list`, controller.business.banner.listBanner);
 
 };

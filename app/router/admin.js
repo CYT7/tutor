@@ -63,4 +63,6 @@ module.exports = app => {
    */
   const bannerApi = '/admin/banner';
   router.post(`${bannerApi}/create`, controller.admin.banner.createBanners);
+  router.delete(`${bannerApi}/del`, controller.admin.banner.delBanners);
+  router.get(`${bannerApi}/list`, controller.admin.banner.listBanners);
 };

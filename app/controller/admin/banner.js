@@ -1,6 +1,6 @@
 /**
  * @author: Chen yt7
- * @date: 2021/02/20 22:00 AM
+ * @date: 2021/02/20 22:00 PM
  */
 'use strict';
 const fs = require('fs');
@@ -29,6 +29,29 @@ class BannerController extends Controller {
     } else {
       ctx.body = { code: res[0], msg: res[1] };
     }
+  }
+  // 删除轮播图
+  async delBanners() {
+    const { ctx, service } = this;
+    const res = await service.banner.adminBannerDel(ctx.request.body);
+    if (res) {
+      ctx.status = 201;
+      ctx.body = { code: res[0], msg: res[1], token: res[2], exp: res[3] };
+    } else {
+      ctx.body = { code: res[0], msg: res[1] };
+    }
+  }
+  // 后台轮播图列表
+  async listBanners() {
+    const { ctx, service } = this;
+    const res = await service.banner.adminBannerList();
+    if (res) {
+      ctx.status = 201;
+      ctx.body = { code: res[0], msg: res[1], data: res[2], token: res[3], exp: res[4] };
+    } else {
+      ctx.body = { code: res[0], msg: res[1] };
+    }
+    ctx.status = 201;
   }
 }
 module.exports = BannerController;
