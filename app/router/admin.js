@@ -57,4 +57,10 @@ module.exports = app => {
    */
   const appointApi = '/admin/appoint';
   router.get(`${appointApi}/list`, controller.admin.appoint.list);
+
+  /**
+   * 预约相关接口
+   */
+  const bannerApi = '/admin/banner';
+  router.post(`${bannerApi}/create`, controller.admin.banner.createBanners);
 };

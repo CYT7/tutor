@@ -12,7 +12,7 @@ class NeedService extends Service {
     const { ctx, app } = this;
     const results = jwt(app, ctx.request.header.authorization);
     if (results[0]) { return [ -1, '请求失败' ]; }
-    const user = await ctx.model.User.findOne({ _id: results[3] }).ne('status', 0);
+    const user = await ctx.model.User.findOne({ _id: results[3] });
     if (!user) { return [ -2, '不存在用户' ]; }
     const need = await ctx.model.Need.create({
       id: 'N' + new Date().getTime(),
@@ -61,13 +61,13 @@ class NeedService extends Service {
     const { ctx, app } = this;
     const results = jwt(app, ctx.request.header.authorization);
     if (results[0]) { return [ -1, '请求失败' ]; }
-    const user = await ctx.model.User.findOne({ _id: results[3] }).ne('status', 0);
+    const user = await ctx.model.User.findOne({ _id: results[3] });
     if (!user) { return [ -2, '非法用户' ]; }
     const application = await ctx.model.Application.findOne({ _id: params._id });
     if (!application) { return [ 400604, '应聘数据异常，请稍后再试' ]; }
     const need = await ctx.model.Need.findOne({ _id: application.Need });
     if (!need) { return [ 400604, '查无此需求' ]; }
-    const Teacher = await ctx.model.Teacher.findOne({ _id: application.Teacher }).ne('status', 0);
+    const Teacher = await ctx.model.Teacher.findOne({ _id: application.Teacher });
     if (!Teacher) { return [ 400604, '查无此老师' ]; }
     await this.ctx.model.Need.updateOne({ id: need.id }, { state: 4, teacher: Teacher, updateTime: Math.round(new Date() / 1000) });
     return [ 0, '此需求选定老师成功', results[1], results[2] ];
@@ -77,9 +77,9 @@ class NeedService extends Service {
     const { ctx, app } = this;
     const results = jwt(app, ctx.request.header.authorization);
     if (results[0]) { return [ -1, '请求失败' ]; }
-    const user = await ctx.model.User.findOne({ _id: results[3] }).ne('status', 0);
+    const user = await ctx.model.User.findOne({ _id: results[3] });
     if (!user) { return [ -2, '非法用户' ]; }
-    const need = await ctx.model.Need.findOne({ id: params.id, state: 4 }).ne('status', 0);
+    const need = await ctx.model.Need.findOne({ id: params.id, state: 4 });
     if (!need) { return [ 400605, '查无此需求' ]; }
     const needPrice = need.totalPrice;
     if (user.balance < needPrice) { return [ 400605, '余额不足，需求无法完成，请充值' ]; }
@@ -107,9 +107,9 @@ class NeedService extends Service {
     const { ctx, app } = this;
     const results = jwt(app, ctx.request.header.authorization);
     if (results[0]) { return [ -1, '请求失败' ]; }
-    const user = await ctx.model.User.findOne({ _id: results[3] }).ne('status', 0);
+    const user = await ctx.model.User.findOne({ _id: results[3] });
     if (!user) { return [ -2, '非法用户' ]; }
-    const need = await ctx.model.Need.findOne({ id: params.id, status: 1 }).ne('state', 6);
+    const need = await ctx.model.Need.findOne({ id: params.id }).ne('state', 6);
     if (!need) { return [ 400606, '查无此需求' ]; }
     if (need.state !== 5) {
       need.state = 6;
@@ -124,9 +124,9 @@ class NeedService extends Service {
     const { ctx, app } = this;
     const results = jwt(app, ctx.request.header.authorization);
     if (results[0]) { return [ -1, '请求失败' ]; }
-    const teacher = await ctx.model.Teacher.findOne({ User: results[3] }).ne('status', 0);
+    const teacher = await ctx.model.Teacher.findOne({ User: results[3] });
     if (!teacher) { return [ -2, '你不是老师' ]; }
-    const need = await ctx.model.Need.findOne({ id: params.id, status: 1 }).ne('state', 6);
+    const need = await ctx.model.Need.findOne({ id: params.id }).ne('state', 6);
     if (!need) { return [ 400606, '查无此需求' ]; }
     if (need.state !== 5) {
       need.state = 6;
@@ -141,7 +141,7 @@ class NeedService extends Service {
     const { ctx, app } = this;
     const results = jwt(app, ctx.request.header.authorization);
     if (results[0]) { return [ -1, '请求失败' ]; }
-    const NeedResult = await this.ctx.model.Need.find({ state: 3 }).ne('status', 0).sort({ createTime: -1, totalPrice: -1 })
+    const NeedResult = await this.ctx.model.Need.find({ state: 3 }).ne('User', results[3]).sort({ createTime: -1, totalPrice: -1 })
       .limit(10);
     if (!NeedResult) { return [ 400607, '暂无需求信息' ]; }
     return [ 0, '所有需求信息返回成功', NeedResult, results[1], results[2] ];
@@ -151,15 +151,15 @@ class NeedService extends Service {
     const { ctx, app } = this;
     const results = jwt(app, ctx.request.header.authorization);
     if (results[0]) { return [ -1, '请求失败' ]; }
-    const user = await ctx.model.User.findOne({ _id: results[3] }).ne('status', 0);
+    const user = await ctx.model.User.findOne({ _id: results[3] });
     if (!user) { return [ -2, '非法用户' ]; }
     const { pageSize } = this.config.paginatorConfig;
-    const total = await this.ctx.model.Need.find({ User: user }).ne('status', 0).countDocuments();
+    const total = await this.ctx.model.Need.find({ User: user }).countDocuments();
     if (!total) { return [ 400608, '暂无需求信息' ]; }
     const totals = Math.ceil(total / pageSize);
     if (page > totals) { return [ -2, '无效页码' ]; }
     if (page < 1) { page = 1; }
-    const NeedResult = await this.ctx.model.Need.find({ User: user }).ne('status', 0).sort({ updateTime: -1, createTime: -1 })
+    const NeedResult = await this.ctx.model.Need.find({ User: user }).sort({ state: -1, updateTime: -1, createTime: -1 })
       .skip((page - 1) * pageSize)
       .limit(pageSize);
     if (!Number(page)) {
@@ -175,12 +175,12 @@ class NeedService extends Service {
     const results = jwt(app, ctx.request.header.authorization);
     if (results[0]) { return [ -1, '请求失败' ]; }
     const { pageSize } = this.config.paginatorConfig;
-    const total = await this.ctx.model.Need.find({ state: 3 }).ne('status', 0).countDocuments();
+    const total = await this.ctx.model.Need.find({ state: 3 }).ne('User', results[3]).countDocuments();
     if (!total) { return [ 400608, '暂无需求信息' ]; }
     const totals = Math.ceil(total / pageSize);
     if (page > totals) { return [ -2, '无效页码' ]; }
     if (page < 1) { page = 1; }
-    const NeedResult = await this.ctx.model.Need.find({ state: 3 }).ne('status', 0).skip((page - 1) * pageSize)
+    const NeedResult = await this.ctx.model.Need.find({ state: 3 }).ne('User', results[3]).skip((page - 1) * pageSize)
       .limit(pageSize);
     if (!Number(page)) {
       page = 1;
@@ -197,10 +197,10 @@ class NeedService extends Service {
     const { pageSize } = this.config.paginatorConfig;
     let total = null;
     if (params.name === null) {
-      total = await this.ctx.model.Need.find({ state: 3 }).ne('status', 0).countDocuments();
+      total = await this.ctx.model.Need.find({ state: 3 }).ne('User', results[3]).countDocuments();
       if (!total) { return [ 400607, '暂无需求信息' ]; }
     } else {
-      total = await this.ctx.model.Need.find({ subject: { $regex: params.name }, state: 3 }).countDocuments();
+      total = await this.ctx.model.Need.find({ subject: { $regex: params.name }, state: 3 }).ne('User', results[3]).countDocuments();
       if (!total) { return [ 400607, '暂无需求信息' ]; }
     }
     const totals = Math.ceil(total / pageSize);
@@ -208,10 +208,10 @@ class NeedService extends Service {
     if (page < 1) { page = 1; }
     let NeedResult = null;
     if (params.name === null) {
-      NeedResult = await this.ctx.model.Need.find({ state: 3 }).ne('status', 0).skip((page - 1) * pageSize)
+      NeedResult = await this.ctx.model.Need.find({ state: 3 }).ne('User', results[3]).skip((page - 1) * pageSize)
         .limit(pageSize);
     } else {
-      NeedResult = await this.ctx.model.Need.find({ subject: { $regex: params.name }, state: 3 }).ne('status', 0).skip((page - 1) * pageSize)
+      NeedResult = await this.ctx.model.Need.find({ subject: { $regex: params.name }, state: 3 }).ne('User', results[3]).skip((page - 1) * pageSize)
         .limit(pageSize);
     }
     if (!Number(page)) {
@@ -226,9 +226,9 @@ class NeedService extends Service {
     const { ctx, app } = this;
     const results = jwt(app, ctx.request.header.authorization);
     if (results[0]) { return [ -1, '请求失败' ]; }
-    const teacher = await this.ctx.model.Teacher.findOne({ User: results[3] }).ne('status', 0);
+    const teacher = await this.ctx.model.Teacher.findOne({ User: results[3] });
     if (!teacher) { return [ 400601, 'sorry，你暂无执教资格，请前往申请' ]; }
-    const need = await ctx.model.Need.findOne({ id: params.id, state: 3 }).ne('status', 0);
+    const need = await ctx.model.Need.findOne({ id: params.id, state: 3 });
     if (!need) { return [ 400601, 'sorry,查无此需求' ]; }
     const find = await ctx.model.Application.findOne({ Need: need, Teacher: teacher });
     if (find) { return [ 400601, '你已经应聘了' ]; }
@@ -252,12 +252,12 @@ class NeedService extends Service {
     const Teacher = await ctx.model.Teacher.findOne({ User: results[3] });
     if (!Teacher) { return [ -2, '你尚未申请做家教，请前往申请' ]; }
     const { pageSize } = this.config.paginatorConfig;
-    const total = await this.ctx.model.Need.find({ teacher: Teacher }).ne('status', 0).countDocuments();
+    const total = await this.ctx.model.Need.find({ teacher: Teacher }).countDocuments();
     if (!total) { return [ 400607, '暂无需求信息' ]; }
     const totals = Math.ceil(total / pageSize);
     if (page > totals) { return [ -2, '无效页码' ]; }
     if (page < 1) { page = 1; }
-    const NeedResult = await this.ctx.model.Need.find({ teacher: Teacher }).ne('status', 0).sort({ updateTime: -1, createTime: -1 })
+    const NeedResult = await this.ctx.model.Need.find({ teacher: Teacher }).sort({ updateTime: -1, createTime: -1 })
       .skip((page - 1) * pageSize)
       .limit(pageSize);
     if (!Number(page)) {
@@ -296,7 +296,7 @@ class NeedService extends Service {
     const { ctx, app } = this;
     const results = jwt(app, ctx.request.header.authorization);
     if (results[0]) { return [ -1, '请求失败' ]; }
-    const user = await ctx.model.User.findOne({ _id: results[3] }).ne('status', 0);
+    const user = await ctx.model.User.findOne({ _id: results[3] });
     if (!user) { return [ -2, '不存在用户' ]; }
     const need = await ctx.model.Need.findOne({ id: params.id, state: 2 });
     if (!need) { return [ 400607, '查无此需求' ]; }
@@ -316,7 +316,7 @@ class NeedService extends Service {
     for (const [ k, v ] of newData) {
       obj[k] = v;
     }
-    obj.teach_date = params.teach_date.join(',')
+    obj.teach_date = params.teach_date.join(',');
     obj.updateTime = Math.round(new Date() / 1000);
     obj.totalPrice = params.frequency * params.timeHour * params.hourPrice;
     obj.state = 1;
@@ -352,12 +352,12 @@ class NeedService extends Service {
     if (page < 1) { page = 1; }
     let NeedResult = null;
     if (types) {
-      NeedResult = await this.ctx.model.Need.find({ state: { $in: typesResults } }).ne('status', 0).skip((page - 1) * pageSize)
+      NeedResult = await this.ctx.model.Need.find({ state: { $in: typesResults } }).skip((page - 1) * pageSize)
         .limit(pageSize)
         .populate('User', 'nickName')
         .exec();
     } else {
-      NeedResult = await this.ctx.model.Need.find({}).ne('status', 0).skip((page - 1) * pageSize)
+      NeedResult = await this.ctx.model.Need.find({}).skip((page - 1) * pageSize)
         .limit(pageSize)
         .exec();
     }

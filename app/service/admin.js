@@ -151,7 +151,7 @@ class AdminService extends Service {
     if (results[0]) { return [ -3, '请求失败' ]; }
     const adminCount = await ctx.model.Admin.find({ deleted: 1 }).countDocuments();
     const userCount = await ctx.model.User.find({ status: 1 }).countDocuments();
-    const teacherCount = await ctx.model.Teacher.find({ status: 1 }).countDocuments();
+    const teacherCount = await ctx.model.Teacher.find().countDocuments();
     const appointCount = await ctx.model.Appoint.find({}).countDocuments();
     const needCount = await ctx.model.Need.find({}).countDocuments();
     const resultMap = {};

@@ -19,7 +19,7 @@ class TeacherService extends Service {
     if (results[0]) { return [ -1, '请求失败' ]; }
     const user = await ctx.model.User.findOne({ _id: results[3] }).ne('status', 0);
     if (!user) { return [ -2, '不存在用户' ]; }
-    const result = await ctx.model.Teacher.findOne({ User: user }).ne('status', 0);
+    const result = await ctx.model.Teacher.findOne({ User: user });
     if (result) { return [ 400500, '你已经申请过当家教了' ]; }
     const teacher = await ctx.model.Teacher.aggregate().sort({ id: -1 });
     const newTeacher = new ctx.model.Teacher({
@@ -51,7 +51,7 @@ class TeacherService extends Service {
     const { ctx, app } = this;
     const results = jwt(app, ctx.request.header.authorization);
     if (results[0]) { return [ -1, '请求失败' ]; }
-    const teacherResult = await ctx.model.Teacher.findOne({ User: results[3] }).ne('status', 0);
+    const teacherResult = await ctx.model.Teacher.findOne({ User: results[3] });
     if (!teacherResult) { return [ 400502, '你尚未申请做家教，请前往申请' ]; }
     return [ 0, '老师信息返回成功', teacherResult, results[1], results[2] ];
   }
@@ -60,7 +60,7 @@ class TeacherService extends Service {
     const { ctx, app } = this;
     const results = jwt(app, ctx.request.header.authorization);
     if (results[0]) { return [ -1, '请求失败' ]; }
-    const teacher = await ctx.model.Teacher.findOne({ User: results[3] }).ne('status', 0);
+    const teacher = await ctx.model.Teacher.findOne({ User: results[3] });
     if (!teacher) { return [ 400503, '你尚未申请做家教，请前往申请' ]; }
     const checkParams = [ 'experience', 'age', 'goodAt', 'hourPrice', 'city', 'realName', 'school' ];
     const newData = new Map();
@@ -190,7 +190,7 @@ class TeacherService extends Service {
     const results = jwt(app, ctx.request.header.authorization);
     if (results[0]) { return [ -3, '请求失败' ]; }
     if (!results[3]) { return [ -1, '非法管理员' ]; }
-    const teacher = await ctx.model.Teacher.findOne({ id: params.id, state: 1 }).ne('status', 0);
+    const teacher = await ctx.model.Teacher.findOne({ id: params.id, state: 1 });
     if (!teacher) { return [ 404301, '不存在该老师，参数异常' ]; }
     await this.ctx.model.Teacher.updateOne({ id: teacher.id }, { state: 3, updateTime: Math.round(new Date() / 1000) });
     return [ 0, `${teacher.id}老师审核通过`, results[1], results[2] ];
@@ -201,7 +201,7 @@ class TeacherService extends Service {
     const results = jwt(app, ctx.request.header.authorization);
     if (results[0]) { return [ -3, '请求失败' ]; }
     if (!results[3]) { return [ -1, '非法管理员' ]; }
-    const teacher = await ctx.model.Teacher.findOne({ id: params.id, state: 1 }).ne('status', 0);
+    const teacher = await ctx.model.Teacher.findOne({ id: params.id, state: 1 });
     if (!teacher) { return [ 404403, '不存在该老师，参数异常' ]; }
     await this.ctx.model.Teacher.updateOne({ id: teacher.id }, { state: 2, updateTime: Math.round(new Date() / 1000) });
     return [ 0, `${teacher.id}老师审核不通过`, results[1], results[2] ];

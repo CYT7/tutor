@@ -29,8 +29,8 @@ module.exports = app => {
     totalPrice: { type: Number, default: 0 }, // 总报价(必选)
     state: { type: Number, default: 1 }, // 审核状态 1审核中,2审核不通过，3审核通过，4已选定，5已完成，6已关闭。
     deleted: { type: Number, default: 0 }, // 家长是否已软删除 0否 1是
-    content: { type: String, default: null }, // 评论
-    rate: { type: Number, default: 3 }, // 评分
+    content: { type: String }, // 评论
+    rate: { type: Number }, // 评分
     createTime: { type: Number, default: null }, // 创建时间
     updateTime: { type: Number, default: null }, // 更新时间
   });

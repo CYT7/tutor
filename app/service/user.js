@@ -16,7 +16,12 @@ class UserService extends Service {
   // 创建用户
   async create(params) {
     const { ctx } = this;
-    const checkUser = await ctx.model.User.findOne({ $or: [{ phone: params.phone }, { email: params.email }] });
+    let checkUser = null;
+    if (!params.email) {
+      checkUser = await ctx.model.User.findOne({ phone: params.phone });
+    } else {
+      checkUser = await ctx.model.User.findOne({ $or: [{ phone: params.phone }, { email: params.email }] });
+    }
     if (checkUser) { return [ 400400, '你已经用手机或邮箱创建过了，请前往登录亲' ]; }
     const user = await ctx.model.User.aggregate().sort({ id: -1 });
     const newUser = new ctx.model.User({
@@ -46,7 +51,7 @@ class UserService extends Service {
   async login(params) {
     const { ctx, app } = this;
     const user = await ctx.model.User.findOne({ $or: [{ phone: params.username }, { email: params.username }] }).ne('status', 0);
-    if (!user) { return [ 400401, '查无此账号' ]; }
+    if (!user) { return [ 400401, '你尚未注册，请前往注册' ]; }
     const pwd = md5(params.password);
     if (pwd !== user.password) { return [ 404401, '登录失败，密码错误' ]; }
     const exp = Math.round(new Date() / 1000) + (60 * 60 * 3);
@@ -102,7 +107,7 @@ class UserService extends Service {
       params.password = md5(params.newPassword);
       if (oldPwd === params.password) { return [ 400403, '新密码不得和旧密码一模一样，请重新输入' ]; }
     }
-    const checkParams = [ 'nickName', 'phone', 'email', 'password', 'qq', 'wechat', 'address', 'gender' ];
+    const checkParams = [ 'nickName','password', 'qq', 'wechat', 'address', 'gender' ];
     const newData = new Map();
     const paramsMap = new Map(Object.entries(params));
     const newUser = new Map(Object.entries(user.toObject()));

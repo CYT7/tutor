@@ -5,10 +5,7 @@
 'use strict';
 /**
  * 这是一个前台JWT鉴权中间件，
- * @param options
- * @param app
- * @return {function(...[*]=)}
- */
+ **/
 module.exports = (options, app) => {
   return async function adminAuth(ctx, next) {
     const param = ctx.request.header.authorization;
@@ -26,10 +23,6 @@ module.exports = (options, app) => {
         try {
           const token = param.split(' ')[1];
           decode = app.jwt.verify(token, options.secret);
-          if (!decode || !decode.id) {
-            ctx.body = { code: 401, msg: 'Token无效' };
-            ctx.status = 201;
-          }
           if ((Math.round(new Date() / 1000) - decode.exp) > 0) {
             ctx.body = { code: 401, msg: 'Token过期' };
             ctx.status = 201;
