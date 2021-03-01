@@ -154,12 +154,14 @@ class AdminService extends Service {
     const teacherCount = await ctx.model.Teacher.find().countDocuments();
     const appointCount = await ctx.model.Appoint.find({}).countDocuments();
     const needCount = await ctx.model.Need.find({}).countDocuments();
+    const bannerCount = await ctx.model.Banner.find({deleted: 1}).countDocuments();
     const resultMap = {};
     resultMap.adminCount = adminCount;
     resultMap.userCount = userCount;
     resultMap.teacherCount = teacherCount;
     resultMap.appointCount = appointCount;
     resultMap.needCount = needCount;
+    resultMap.bannerCount = bannerCount;
     return [ 0, '信息返回成功', resultMap ];
   }
 }

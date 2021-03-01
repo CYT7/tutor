@@ -61,7 +61,7 @@ module.exports = appInfo => {
     secret: 'nPp1rYeZhq2HNfD3AO}I0aGV+Z^5/-LM~Wu7S&ejxKlJwiE4Fve+B8dgCXtQyUbs9oR6cT*k',
   };
   config.jwtAuth = {
-    enable: false,
+    enable: true,
     ignore: [ '/business', '/admin/login', '/public' ],
   };
   config.userAuth = {
