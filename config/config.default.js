@@ -22,9 +22,7 @@ module.exports = appInfo => {
   };
   // csrf config csrf配置
   config.security = {
-    csrf: {
-      enable: false,
-    },
+    csrf: { enable: false, },
     domainWhiteList: [ '*' ], // 允许访问接口的白名单
   };
   // 跨域的配置

@@ -1,7 +1,7 @@
 /**
  * @author: Chenyt
  * @date: 2020/12/11 11:00 AM
- * @CompletionDate：2020/02/06 9:35AM
+ * @CompletionDate：2020/03/02 4:50AM
  */
 'use strict';
 const Controller = require('egg').Controller;
@@ -65,6 +65,28 @@ class AdminController extends Controller {
   async delete() {
     const { ctx } = this;
     const res = await ctx.service.admin.delete(ctx.request.body);
+    if (res) {
+      ctx.status = 201;
+      ctx.body = { code: res[0], msg: res[1], token: res[2], exp: res[3] };
+    } else {
+      ctx.body = { code: res[0], msg: res[1] };
+    }
+  }
+  // 禁用管理员
+  async disable(){
+    const { ctx } = this;
+    const res = await ctx.service.admin.disable(ctx.request.body);
+    if (res) {
+      ctx.status = 201;
+      ctx.body = { code: res[0], msg: res[1], token: res[2], exp: res[3] };
+    } else {
+      ctx.body = { code: res[0], msg: res[1] };
+    }
+  }
+  // 恢复管理员
+  async recovery(){
+    const { ctx } = this;
+    const res = await ctx.service.admin.recovery(ctx.request.body);
     if (res) {
       ctx.status = 201;
       ctx.body = { code: res[0], msg: res[1], token: res[2], exp: res[3] };

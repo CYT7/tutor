@@ -1,7 +1,7 @@
 /**
  * @author: Chen yt7
  * @date: 2020/12/14 10:15 AM
-* @modifyDate：2021/02/06 11：00AM
+* @CompletionDate：2020/03/02 3：50PM
  */
 'use strict';
 
@@ -80,12 +80,12 @@ class UserService extends Service {
     const results = jwt(app, ctx.request.header.authorization);
     if (results[0]) { return [ -1, '请求失败' ]; }
     const { pageSize } = this.config.paginatorConfig;
-    const total = await this.ctx.model.User.find({}).ne('status', 0).countDocuments();
+    const total = await this.ctx.model.User.find({}).countDocuments();
     if (!total) { return [ 404201, '暂无用户信息' ]; }
     const totals = Math.ceil(total / pageSize);
     if (page > totals) { return [ -2, '无效页码' ]; }
     if (page < 1) { page = 1; }
-    const userResult = await this.ctx.model.User.find({}, { _id: 0, password: 0 }).ne('status', 0).skip((page - 1) * pageSize)
+    const userResult = await this.ctx.model.User.find({}, { _id: 0, password: 0 }).skip((page - 1) * pageSize)
       .limit(pageSize);
     if (!Number(page)) {
       page = 1;
@@ -107,7 +107,11 @@ class UserService extends Service {
       params.password = md5(params.newPassword);
       if (oldPwd === params.password) { return [ 400403, '新密码不得和旧密码一模一样，请重新输入' ]; }
     }
-    const checkParams = [ 'nickName','password', 'qq', 'wechat', 'address', 'gender' ];
+    if (params.email) {
+      const check = await ctx.model.User.findOne({ email: params.email });
+      if (!check) { return [ 400403, '此邮箱已经被注册过，不能重复' ]; }
+    }
+    const checkParams = [ 'nickName', 'email', 'password', 'qq', 'wechat', 'address', 'gender' ];
     const newData = new Map();
     const paramsMap = new Map(Object.entries(params));
     const newUser = new Map(Object.entries(user.toObject()));

@@ -1,7 +1,7 @@
 /**
  * @author: Chen yt7
  * @date: 2020/12/12 2:30 PM
- * @CompletionDate：2021/02/06 9:35AM
+ * @CompletionDate：2021/03/02 4:50AM
  */
 'use strict';
 const Service = require('egg').Service;
@@ -144,6 +144,30 @@ class AdminService extends Service {
     await this.ctx.model.Admin.updateOne({ id: check.id }, { deleted: 0 });
     return [ 0, `该管理员${check.name}软删除了，执行人是${results[3]}`, results[1], results[2] ];
   }
+  // 禁用管理员
+  async disable(params) {
+    const { ctx, app } = this;
+    const results = jwt(app, ctx.request.header.authorization);
+    if (results[0]) { return [ -3, '请求失败' ]; }
+    const admin = await ctx.model.Admin.findOne({ id: params.id }).ne('deleted', 0);
+    if (!admin) { return [ 404008, '该管理员不存在' ]; }
+    const check = await ctx.model.Admin.findOne({ id: params.id, status: 0 });
+    if (check) { return [ 404008, '该管理员已经禁用' ]; }
+    await this.ctx.model.Admin.updateOne({ id: admin.id }, { status: 0 });
+    return [ 0, `该管理员${admin.name}禁用成功，执行人是${results[3]}`, results[1], results[2] ];
+  }
+  // 恢复管理员
+  async recovery(params) {
+    const { ctx, app } = this;
+    const results = jwt(app, ctx.request.header.authorization);
+    if (results[0]) { return [ -3, '请求失败' ]; }
+    const admin = await ctx.model.Admin.findOne({ id: params.id }).ne('deleted', 0);
+    if (!admin) { return [ 404008, '该管理员不存在' ]; }
+    const check = await ctx.model.Admin.findOne({ id: params.id, status: 1 });
+    if (check) { return [ 404008, '该管理员已经恢复状态了' ]; }
+    await this.ctx.model.Admin.updateOne({ id: admin.id }, { status: 1 });
+    return [ 0, `该管理员${admin.name}恢复成功，执行人是${results[3]}`, results[1], results[2] ];
+  }
   // dashboard仪表盘
   async dashboard() {
     const { ctx, app } = this;
@@ -154,7 +178,7 @@ class AdminService extends Service {
     const teacherCount = await ctx.model.Teacher.find().countDocuments();
     const appointCount = await ctx.model.Appoint.find({}).countDocuments();
     const needCount = await ctx.model.Need.find({}).countDocuments();
-    const bannerCount = await ctx.model.Banner.find({deleted: 1}).countDocuments();
+    const bannerCount = await ctx.model.Banner.find({ deleted: 1 }).countDocuments();
     const resultMap = {};
     resultMap.adminCount = adminCount;
     resultMap.userCount = userCount;
