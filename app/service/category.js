@@ -15,7 +15,10 @@ class CategoryService extends Service {
     const results = jwt(app, ctx.request.header.authorization);
     if (results[0]) if (results[0]) { return [ -3, '请求失败' ]; }
     const category = await ctx.model.Category.aggregate().sort({ id: -1 });
-    const newCategory = new ctx.model.Category({ createTime: Math.round(new Date() / 1000) });
+    const newCategory = new ctx.model.Category({
+      id: category.length === 0 ? 1 : category[0].id + 1,
+      createTime: Math.round(new Date() / 1000),
+    });
     if (params.parentId) {
       const checkId = await ctx.model.Category.findOne({ id: params.parentId }).ne('deleted', 0);
       if (!checkId) { return [ 404101, '不存在父级id' ]; }
@@ -24,12 +27,6 @@ class CategoryService extends Service {
     } else {
       newCategory.name = params.name;
     }
-    if (!category.length) {
-      newCategory.id = 1;
-      newCategory.save();
-      return [ 0, `${newCategory.name} 创建成功`, results[1], results[2] ];
-    }
-    newCategory.id = category[0].id + 1;
     newCategory.save();
     return [ 0, `${newCategory.name} 创建成功`, results[1], results[2] ];
   }

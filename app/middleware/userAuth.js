@@ -9,7 +9,7 @@
 module.exports = (options, app) => {
   return async function adminAuth(ctx, next) {
     const param = ctx.request.header.authorization;
-    console.log(`JWT MiddleWare Start At: ${ctx.request.url}`);
+    console.log(`User JWT MiddleWare Start At: ${ctx.request.url}`);
     if (!param) {
       ctx.body = { code: 404, msg: '没有验证头部' };
       ctx.status = 201;

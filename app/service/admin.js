@@ -17,7 +17,7 @@ class AdminService extends Service {
     const checkName = await ctx.model.Admin.findOne({ name: params.name }).ne('deleted', 0);
     if (checkName) { return [ 404002, '管理员名已经存在' ]; }
     const newAdmin = await ctx.model.Admin.create({
-      id: admin[0].id + 1,
+      id: admin.length === 0 ? 1 : admin[0].id + 1,
       name: params.name,
       password: md5(params.password),
       realName: params.realName,
@@ -30,10 +30,8 @@ class AdminService extends Service {
   async login(params) {
     const { ctx, app } = this;
     const checkAdmin = await ctx.model.Admin.findOne({ name: params.name, status: 1 }).ne('deleted', 0);
-    if (!checkAdmin) { return [ -1, `${checkAdmin.name}不存在` ]; }
-    const accountPwd = checkAdmin.password;
-    const checkPwd = md5(params.password);
-    if (accountPwd !== checkPwd) { return [ 404001, '管理员密码错误，请重新输入' ]; }
+    if (!checkAdmin) { return [ -1, `${params.name}不存在` ]; }
+    if (checkAdmin.password !== md5(params.password)) { return [ 404001, '管理员密码错误，请重新输入' ]; }
     const exp = Math.round(new Date() / 1000) + (60 * 60 * 3);
     const token = app.jwt.sign({
       name: params.name,

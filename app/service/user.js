@@ -22,9 +22,10 @@ class UserService extends Service {
     } else {
       checkUser = await ctx.model.User.findOne({ $or: [{ phone: params.phone }, { email: params.email }] });
     }
-    if (checkUser) { return [ 400400, '你已经用手机或邮箱创建过了，请前往登录亲' ]; }
+    if (checkUser) { return [ 400400, '你已经用手机或邮箱注册过了，请前往登录' ]; }
     const user = await ctx.model.User.aggregate().sort({ id: -1 });
     const newUser = new ctx.model.User({
+      id: user.length === 0 ? 1 : user[0].id + 1,
       createTime: Math.round(new Date() / 1000),
       phone: params.phone,
       email: params.email,
@@ -37,13 +38,6 @@ class UserService extends Service {
       const round = Math.round(new Date() / 1000);
       newUser.nickName = '用户' + round;
     }
-    if (!user.length) {
-      newUser.id = new Date().getFullYear().toString()
-        .substr(0, 4) + '01';
-      newUser.save();
-      return [ 0, '用户创建成功，你可以进行登录了' ];
-    }
-    newUser.id = user[0].id + 1;
     newUser.save();
     return [ 0, '用户创建成功，你可以进行登录了' ];
   }
