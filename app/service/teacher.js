@@ -44,6 +44,8 @@ class TeacherService extends Service {
     const Id = Number(teacher[0].id.substr(1));
     newTeacher.id = `T${Id + 1}`;
     newTeacher.save();
+    user.type = 1;
+    user.save();
     return [ 0, `${user.nickName} 申请做家教成功，请等待管理员审核`, results[1], results[2] ];
   }
   // 查看教师个人信息
@@ -98,12 +100,12 @@ class TeacherService extends Service {
     const results = jwt(app, ctx.request.header.authorization);
     if (results[0]) { return [ -1, '请求失败' ]; }
     const { pageSize } = this.config.paginatorConfig;
-    const total = await this.ctx.model.Teacher.find({ state: 3 }).countDocuments();
+    const total = await this.ctx.model.Teacher.find({ state: 3 }).ne('User', results[3]).countDocuments();
     if (!total) { return [ 404504, '暂无教师信息' ]; }
     const totals = Math.ceil(total / pageSize);
     if (page > totals) { return [ -2, '无效页码' ]; }
     if (page < 1) { page = 1; }
-    const result = await this.ctx.model.Teacher.find({ state: 3 }).skip((page - 1) * pageSize)
+    const result = await this.ctx.model.Teacher.find({ state: 3 }).ne('User', results[3]).skip((page - 1) * pageSize)
       .limit(pageSize);
     if (!Number(page)) {
       page = 1;
@@ -120,10 +122,10 @@ class TeacherService extends Service {
     const { pageSize } = this.config.paginatorConfig;
     let total = null;
     if (params.name === null) {
-      total = await this.ctx.model.Teacher.find({ state: 3 }).countDocuments();
+      total = await this.ctx.model.Teacher.find({ state: 3 }).ne('User', results[3]).countDocuments();
       if (!total) { return [ 404505, '暂无教师信息' ]; }
     } else {
-      total = await this.ctx.model.Teacher.find({ goodAt: { $regex: params.name }, state: 3 }).countDocuments();
+      total = await this.ctx.model.Teacher.find({ goodAt: { $regex: params.name }, state: 3 }).ne('User', results[3]).countDocuments();
       if (!total) { return [ 404505, '暂无教师信息' ]; }
     }
     const totals = Math.ceil(total / pageSize);
@@ -131,9 +133,11 @@ class TeacherService extends Service {
     if (page < 1) { page = 1; }
     let result = null;
     if (params.name === null) {
-      result = await this.ctx.model.Teacher.find({ state: 3 }).skip((page - 1) * pageSize).limit(pageSize);
+      result = await this.ctx.model.Teacher.find({ state: 3 }).ne('User', results[3]).skip((page - 1) * pageSize)
+        .limit(pageSize);
     } else {
-      result = await this.ctx.model.Teacher.find({ goodAt: { $regex: params.name }, state: 3 }).skip((page - 1) * pageSize).limit(pageSize);
+      result = await this.ctx.model.Teacher.find({ goodAt: { $regex: params.name }, state: 3 }).ne('User', results[3]).skip((page - 1) * pageSize)
+        .limit(pageSize);
     }
     if (!Number(page)) {
       page = 1;
@@ -148,7 +152,8 @@ class TeacherService extends Service {
     const results = jwt(app, ctx.request.header.authorization);
     if (results[0]) { return [ -3, '请求失败' ]; }
     const result = await this.ctx.model.Teacher.find({ state: 3 }).populate({ path: 'User', select: { _id: 0, password: 0, id: 0 } }).sort({ totalSuccess: -1, hourPrice: -1, experience: -1 })
-      .limit(10);
+      .ne('User', results[3])
+      .limit(6);
     if (!result) { return [ 404506, '暂无教师信息' ]; }
     return [ 0, '所有教师信息返回成功', result, results[1], results[2] ];
   }

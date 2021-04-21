@@ -207,7 +207,7 @@ class AppointService extends Service {
     const totals = Math.ceil(total / pageSize);
     if (page > totals) { return [ -2, '无效页码' ]; }
     if (page < 1) { page = 1; }
-    const appointResult = await this.ctx.model.Appoint.find({ student: user }).sort({ updateTime: -1, createTime: -1 })
+    const appointResult = await this.ctx.model.Appoint.find({ student: user }).sort({ createTime: -1, updateTime: -1 })
       .skip((page - 1) * pageSize)
       .limit(pageSize);
     if (!Number(page)) {
@@ -230,7 +230,7 @@ class AppointService extends Service {
     const totals = Math.ceil(total / pageSize);
     if (page > totals) { return [ -2, '无效页码' ]; }
     if (page < 1) { page = 1; }
-    const appointResult = await this.ctx.model.Appoint.find({ teacher }).sort({ updateTime: -1, createTime: -1 })
+    const appointResult = await this.ctx.model.Appoint.find({ teacher }).sort({ createTime: -1, updateTime: -1 })
       .skip((page - 1) * pageSize)
       .limit(pageSize);
     if (!Number(page)) {
@@ -269,11 +269,11 @@ class AppointService extends Service {
     if (page < 1) { page = 1; }
     let AppointResult = null;
     if (types) {
-      AppointResult = await this.ctx.model.Appoint.find({ state: { $in: typesResults } }).sort({ updateTime: -1, createTime: -1 })
+      AppointResult = await this.ctx.model.Appoint.find({ state: { $in: typesResults } }).sort({ createTime: -1, updateTime: -1 })
         .skip((page - 1) * pageSize)
         .limit(pageSize);
     } else {
-      AppointResult = await this.ctx.model.Appoint.find({}).sort({ updateTime: -1, createTime: -1 })
+      AppointResult = await this.ctx.model.Appoint.find({}).sort({ state: 1, createTime: -1, updateTime: -1 })
         .skip((page - 1) * pageSize)
         .limit(pageSize);
     }

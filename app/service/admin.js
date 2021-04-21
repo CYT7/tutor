@@ -149,9 +149,10 @@ class AdminService extends Service {
     if (results[0]) { return [ -3, '请求失败' ]; }
     const admin = await ctx.model.Admin.findOne({ id: params.id }).ne('deleted', 0);
     if (!admin) { return [ 404008, '该管理员不存在' ]; }
+    if (admin.name === results[3]) { return [ 404008, '不允许操作自已的账号状态' ]; }
     const check = await ctx.model.Admin.findOne({ id: params.id, status: 0 });
     if (check) { return [ 404008, '该管理员已经禁用' ]; }
-    await this.ctx.model.Admin.updateOne({ id: admin.id }, { status: 0 });
+    await this.ctx.model.Admin.updateOne({ id: admin.id }, { status: 0, updateTime: Math.round(new Date() / 1000) });
     return [ 0, `该管理员${admin.name}禁用成功，执行人是${results[3]}`, results[1], results[2] ];
   }
   // 恢复管理员
@@ -163,7 +164,7 @@ class AdminService extends Service {
     if (!admin) { return [ 404008, '该管理员不存在' ]; }
     const check = await ctx.model.Admin.findOne({ id: params.id, status: 1 });
     if (check) { return [ 404008, '该管理员已经恢复状态了' ]; }
-    await this.ctx.model.Admin.updateOne({ id: admin.id }, { status: 1 });
+    await this.ctx.model.Admin.updateOne({ id: admin.id }, { status: 1, updateTime: Math.round(new Date() / 1000) });
     return [ 0, `该管理员${admin.name}恢复成功，执行人是${results[3]}`, results[1], results[2] ];
   }
   // dashboard仪表盘

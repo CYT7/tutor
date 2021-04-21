@@ -26,7 +26,7 @@ module.exports = app => {
     address: { type: String, default: null }, // 详情地址
     subject: { type: String, default: null }, // 科目
     content: { type: String, default: null }, // 评论
-    rate: { type: Number, default: 3 }, // 评分
+    rate: { type: Number }, // 评分
     createTime: { type: Number, default: null }, // 创建时间
     updateTime: { type: Number, default: null }, // 更新时间
   });

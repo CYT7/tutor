@@ -141,8 +141,8 @@ class NeedService extends Service {
     const { ctx, app } = this;
     const results = jwt(app, ctx.request.header.authorization);
     if (results[0]) { return [ -1, '请求失败' ]; }
-    const NeedResult = await this.ctx.model.Need.find({ state: 3 }).ne('User', results[3]).sort({ createTime: -1, totalPrice: -1 })
-      .limit(10);
+    const NeedResult = await this.ctx.model.Need.find({ state: 3 }).ne('User', results[3]).sort({ totalPrice: -1, hourPrice: -1, createTime: -1 })
+      .limit(6);
     if (!NeedResult) { return [ 400607, '暂无需求信息' ]; }
     return [ 0, '所有需求信息返回成功', NeedResult, results[1], results[2] ];
   }
@@ -159,7 +159,7 @@ class NeedService extends Service {
     const totals = Math.ceil(total / pageSize);
     if (page > totals) { return [ -2, '无效页码' ]; }
     if (page < 1) { page = 1; }
-    const NeedResult = await this.ctx.model.Need.find({ User: user }).sort({ state: -1, updateTime: -1, createTime: -1 })
+    const NeedResult = await this.ctx.model.Need.find({ User: user }).sort({ state: -1, createTime: -1, updateTime: -1 })
       .skip((page - 1) * pageSize)
       .limit(pageSize);
     if (!Number(page)) {
@@ -276,7 +276,7 @@ class NeedService extends Service {
     if (!admin) { return [ -1, '非法管理员' ]; }
     const need = await ctx.model.Need.findOne({ id: params.id, state: 1 });
     if (!need) { return [ 404401, '查无此需求' ]; }
-    await this.ctx.model.Need.updateOne({ id: need.id }, { state: 3 });
+    await this.ctx.model.Need.updateOne({ id: need.id }, { state: 3, updateTime: Math.round(new Date() / 1000) });
     return [ 0, '此需求审核通过', results[1], results[2] ];
   }
   // 审核需求 - 不通过
@@ -288,7 +288,7 @@ class NeedService extends Service {
     if (!admin) { return [ -1, '非法管理员' ]; }
     const need = await ctx.model.Need.findOne({ id: params.id, state: 1 });
     if (!need) { return [ 404402, '查无此需求' ]; }
-    await this.ctx.model.Need.updateOne({ id: need.id }, { state: 2 });
+    await this.ctx.model.Need.updateOne({ id: need.id }, { state: 2, updateTime: Math.round(new Date() / 1000)  });
     return [ 0, '此需求审核不通过', results[1], results[2] ];
   }
   // 修改需求(审核不通过)
@@ -352,12 +352,12 @@ class NeedService extends Service {
     if (page < 1) { page = 1; }
     let NeedResult = null;
     if (types) {
-      NeedResult = await this.ctx.model.Need.find({ state: { $in: typesResults } }).skip((page - 1) * pageSize)
+      NeedResult = await this.ctx.model.Need.find({ state: { $in: typesResults } }).sort({ createTime: -1, updateTime: -1 }).skip((page - 1) * pageSize)
         .limit(pageSize)
         .populate('User', 'nickName')
         .exec();
     } else {
-      NeedResult = await this.ctx.model.Need.find({}).skip((page - 1) * pageSize)
+      NeedResult = await this.ctx.model.Need.find({}).sort({ createTime: -1, updateTime: -1 }).skip((page - 1) * pageSize)
         .limit(pageSize)
         .exec();
     }
