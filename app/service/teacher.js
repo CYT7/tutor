@@ -151,9 +151,9 @@ class TeacherService extends Service {
     const { ctx, app } = this;
     const results = jwt(app, ctx.request.header.authorization);
     if (results[0]) { return [ -3, '请求失败' ]; }
-    const result = await this.ctx.model.Teacher.find({ state: 3 }).populate({ path: 'User', select: { _id: 0, password: 0, id: 0 } }).sort({ totalSuccess: -1, hourPrice: -1, experience: -1 })
+    const result = await this.ctx.model.Teacher.find({ state: 3 }).populate({ path: 'User', select: { _id: 0, password: 0, id: 0 } }).sort({ totalSuccess: -1, satisfaction: -1, hourPrice: -1 })
       .ne('User', results[3])
-      .limit(6);
+      .limit(3);
     if (!result) { return [ 404506, '暂无教师信息' ]; }
     return [ 0, '所有教师信息返回成功', result, results[1], results[2] ];
   }
