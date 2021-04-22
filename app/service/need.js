@@ -159,7 +159,7 @@ class NeedService extends Service {
     const totals = Math.ceil(total / pageSize);
     if (page > totals) { return [ -2, '无效页码' ]; }
     if (page < 1) { page = 1; }
-    const NeedResult = await this.ctx.model.Need.find({ User: user }).sort({ state: -1, createTime: -1, updateTime: -1 })
+    const NeedResult = await this.ctx.model.Need.find({ User: user }).sort({ createTime: -1, state: -1, updateTime: -1 })
       .skip((page - 1) * pageSize)
       .limit(pageSize);
     if (!Number(page)) {
